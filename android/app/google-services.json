@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "964110836736",
+    "project_id": "mekinaye-3069b",
+    "storage_bucket": "mekinaye-3069b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:964110836736:android:fbdccbe9157748e27064e5",
+        "android_client_info": {
+          "package_name": "com.mekinaye"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "964110836736-jf2lil9r4l49gv4copkv99bedh5dbnut.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAnV1yXxEtKw8R9npxiofGQ6PcYCPW2KPo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "964110836736-jf2lil9r4l49gv4copkv99bedh5dbnut.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "964110836736-m4c77m2bnhmc1qdvep8gavjekr6ajh4p.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.mekinaye"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
