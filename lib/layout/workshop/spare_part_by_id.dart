@@ -22,12 +22,11 @@ class SingleSparePartScreen extends StatelessWidget {
   final List<SparePart> spareParts;
   final UserModel owner;
 
-  SingleSparePartScreen({
-    required this.carBrandId,
-    required this.ownerId,
-  required this.spareParts,
-    required this.owner
-  });
+  SingleSparePartScreen(
+      {required this.carBrandId,
+      required this.ownerId,
+      required this.spareParts,
+      required this.owner});
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +49,7 @@ class SingleSparePartScreen extends StatelessWidget {
       ),
       body: Padding(
           padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
-          child:  GridView.builder(
+          child: GridView.builder(
               shrinkWrap: true,
               scrollDirection: Axis.vertical,
               physics: BouncingScrollPhysics(),
@@ -64,18 +63,18 @@ class SingleSparePartScreen extends StatelessWidget {
                 return GestureDetector(
                   onTap: () async {
                     print("to messages");
-                    bool isLoggedIn =
-                        await AuthService.isUserLoggedIn();
-                    if(isLoggedIn){
-                      Get.to(() => MessagingScreen(ownerId: ownerId, owner: owner, args: {
-                        'isFromNotification': false
-                      }));
-                    }else{
+                    bool isLoggedIn = await AuthService.isUserLoggedIn();
+                    if (isLoggedIn) {
+                      Get.to(() => MessagingScreen(
+                          ownerId: ownerId,
+                          owner: owner,
+                          args: {'isFromNotification': false}));
+                    } else {
                       CustomSnackBar.showCustomSnackBar(
-                      title: 'Login',
-                      message: 'Please Login or Sign up',
-                      duration: Duration(seconds: 2),
-                    );
+                        title: 'Login',
+                        message: 'Please Login or Sign up',
+                        duration: Duration(seconds: 2),
+                      );
                       Get.to(() => AskToLogin());
                     }
                   },
@@ -85,8 +84,8 @@ class SingleSparePartScreen extends StatelessWidget {
                       height: 70,
                       width: 70,
                       decoration: BoxDecoration(
-                          color: Color(0xFFF5F8FF),
-                          borderRadius: BorderRadius.all(Radius.circular(20))
+                        color: theme.cardBackground,
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -95,8 +94,12 @@ class SingleSparePartScreen extends StatelessWidget {
                           CachedNetworkImage(
                             imageUrl: sparePart.image, // Image URL
                             height: 100.h,
-                            placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                            errorWidget: (context, url, error) => Image.asset('assets/images/logo.png',height: 100.h,),
+                            placeholder: (context, url) =>
+                                Center(child: CircularProgressIndicator()),
+                            errorWidget: (context, url, error) => Image.asset(
+                              'assets/images/logo.png',
+                              height: 100.h,
+                            ),
                           ),
                           SizedBox(height: 8.h),
                           Text(
@@ -104,32 +107,29 @@ class SingleSparePartScreen extends StatelessWidget {
                             style: theme.typography.titleMedium.copyWith(
                                 color: theme.primaryText,
                                 fontSize: 16.0,
-                                fontWeight: FontWeight.bold
-                            ),
+                                fontWeight: FontWeight.bold),
                           ),
                           Text(
                             sparePart.description,
                             style: theme.typography.titleMedium.copyWith(
-                                color: theme.primaryText,
-                                fontSize: 14.0,
+                              color: theme.primaryText,
+                              fontSize: 14.0,
                             ),
                           ),
                           SizedBox(height: 8.h),
                           Text(
                             'Price: \$${sparePart.price.toStringAsFixed(2)}',
                             style: theme.typography.titleMedium.copyWith(
-                              color: theme.primaryText,
-                              fontSize: 15.0,
-                            ),
+                                color: theme.primaryText,
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
                     ),
                   ),
                 );
-              })
-
-      ),
+              })),
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 10.0),
         child: ScaleTransition(
@@ -140,13 +140,13 @@ class SingleSparePartScreen extends StatelessWidget {
             isExtended: true,
             tooltip: "Chat with provider",
             onPressed: () async {
-              bool isLoggedIn =
-              await AuthService.isUserLoggedIn();
-              if(isLoggedIn){
-                Get.to(() => MessagingScreen(ownerId: ownerId, owner: owner, args: {
-                  'isFromNotification': false
-                }));
-              }else{
+              bool isLoggedIn = await AuthService.isUserLoggedIn();
+              if (isLoggedIn) {
+                Get.to(() => MessagingScreen(
+                    ownerId: ownerId,
+                    owner: owner,
+                    args: {'isFromNotification': false}));
+              } else {
                 CustomSnackBar.showCustomSnackBar(
                   title: 'Login',
                   message: 'Please Login or Sign up',
@@ -160,15 +160,19 @@ class SingleSparePartScreen extends StatelessWidget {
                   backgroundColor: MaterialStatePropertyAll(Colors.transparent),
                   elevation: MaterialStatePropertyAll(0)),
               onPressed: () {
-                Get.to(() => MessagingScreen(ownerId: ownerId, owner: owner, args: {
-                  'isFromNotification': false
-                }));
+                Get.to(() => MessagingScreen(
+                    ownerId: ownerId,
+                    owner: owner,
+                    args: {'isFromNotification': false}));
               },
-              icon: const Icon(CupertinoIcons.chat_bubble_fill, color: Colors.white),
+              icon: const Icon(CupertinoIcons.chat_bubble_fill,
+                  color: Colors.white),
               label: Text(
                 'Chat with provider',
                 style: TextStyle(
-                    fontSize: 15, fontWeight: FontWeight.w800, color: Colors.white),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white),
               ),
             ),
             backgroundColor: theme.primary,

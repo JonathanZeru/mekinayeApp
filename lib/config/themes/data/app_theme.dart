@@ -90,7 +90,7 @@ class LightModeTheme extends AppTheme {
   @override
   Color get lineColor => const Color(0xFFB7B7B7);
   @override
-  Color get cardBackground => const Color(0xFFF2F2F2);
+  Color get cardBackground => const Color(0xFFF5F8FF);
   @override
   Color get cardText => const Color(0xFF2E2E2E);
   @override
@@ -160,7 +160,7 @@ class DarkModeTheme extends AppTheme {
   @override
   Color get lineColor => const Color(0xFF22282F);
   @override
-  Color get cardBackground => const Color.fromARGB(255, 105, 62, 51);
+  Color get cardBackground => Color.fromARGB(63, 245, 248, 255);
   @override
   Color get cardText => const Color(0xFFFFFFFF);
   @override

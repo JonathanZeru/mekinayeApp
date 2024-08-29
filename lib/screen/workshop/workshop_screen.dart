@@ -40,62 +40,63 @@ class WorkshopScreen extends GetView<CarBrandsController> {
           exception: controller.apiException.value,
           retry: () => controller.fetchCarBrands(),
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
-            child:  GridView.builder(
-              shrinkWrap: true,
-              scrollDirection: Axis.vertical,
-              physics: BouncingScrollPhysics(),
-              itemCount: controller.carBrands.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.8,
-              ),
-              itemBuilder: (context, index) {
-                final carBrand = controller.carBrands[index];
-                return GestureDetector(
-                  onTap: (){
-                    Get.to(() => SingleSparePartScreen(
-                      carBrandId: carBrand.id,
-                      ownerId: carBrand.ownerId,
-                        spareParts: carBrand.spareParts!,
-                      owner: carBrand.owner
-                    ));
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Container(
-                      height: 70,
-                      width: 70,
-                      decoration: BoxDecoration(
-                          color: Color(0xFFF5F8FF),
-                          borderRadius: BorderRadius.all(Radius.circular(20))
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CachedNetworkImage(
-                            imageUrl: carBrand.image, // Image URL
-                            height: 100.h,
-                            placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                            errorWidget: (context, url, error) => Image.asset('assets/images/logo.png',height: 100.h,),
-                          ),
-
-                          Text(
-                            carBrand.name,
-                            style: theme.typography.titleMedium.copyWith(
-                              color: theme.primaryText,
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+              padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
+              child: GridView.builder(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.vertical,
+                  physics: BouncingScrollPhysics(),
+                  itemCount: controller.carBrands.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.8,
                   ),
-                );
-              })
-          ),
+                  itemBuilder: (context, index) {
+                    final carBrand = controller.carBrands[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Get.to(() => SingleSparePartScreen(
+                            carBrandId: carBrand.id,
+                            ownerId: carBrand.ownerId,
+                            spareParts: carBrand.spareParts!,
+                            owner: carBrand.owner));
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Container(
+                          height: 70,
+                          width: 70,
+                          decoration: BoxDecoration(
+                              color: theme.cardBackground,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20))),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CachedNetworkImage(
+                                imageUrl: carBrand.image, // Image URL
+                                height: 100.h,
+                                placeholder: (context, url) =>
+                                    Center(child: CircularProgressIndicator()),
+                                errorWidget: (context, url, error) =>
+                                    Image.asset(
+                                  'assets/images/logo.png',
+                                  height: 100.h,
+                                ),
+                              ),
+                              Text(
+                                carBrand.name,
+                                style: theme.typography.titleMedium.copyWith(
+                                    color: theme.primaryText,
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  })),
         );
       }),
     );
