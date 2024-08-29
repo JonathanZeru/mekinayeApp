@@ -1,19 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mekinaye/config/themes/data/app_theme.dart';
 import 'package:mekinaye/screen/chat/chat_screen.dart';
 import 'package:mekinaye/screen/rules/rules_screen.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
-import 'package:mekinaye/generated/assets.dart';
 import 'package:mekinaye/screen/profile/profile_screen.dart';
 import 'package:mekinaye/util/app_routes.dart';
 
 import 'home/home_screen.dart';
-import 'message/message_screen.dart';
-
 
 class MainLayoutScreen extends StatefulWidget {
   const MainLayoutScreen({Key? key}) : super(key: key);
@@ -33,42 +29,41 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
+    AppTheme.of(context);
 
-    return PersistentTabView(
-
-      context,
-      controller: _controller,
-      screens: buildScreens(),
-      items: _navBarsItems(),
-      confineInSafeArea: true,
-      backgroundColor: theme.colorScheme.surface,
-      itemAnimationProperties: const ItemAnimationProperties(
-        duration: Duration(milliseconds: 200),
-        curve: Curves.ease,
-      ),
-      screenTransitionAnimation: const ScreenTransitionAnimation(
-        animateTabTransition: true,
-        curve: Curves.ease,
-        duration: Duration(milliseconds: 200),
-      ),
-      navBarStyle: NavBarStyle.style8,
-      navBarHeight: 60
-    );
+    return PersistentTabView(context,
+        controller: _controller,
+        screens: buildScreens(),
+        items: _navBarsItems(),
+        confineInSafeArea: true,
+        backgroundColor: Colors.white,
+        itemAnimationProperties: const ItemAnimationProperties(
+          duration: Duration(milliseconds: 200),
+          curve: Curves.ease,
+        ),
+        screenTransitionAnimation: const ScreenTransitionAnimation(
+          animateTabTransition: true,
+          curve: Curves.ease,
+          duration: Duration(milliseconds: 200),
+        ),
+        navBarStyle: NavBarStyle.style8,
+        navBarHeight: 60);
   }
 
   List<Widget> buildScreens() {
     return [
       const HomeScreen(), // Index 0: Home Page
       ChatListScreen(), // Index 1: Chat  Page
-      const RulesScreen() // Index 2: Rules  Page
+      const RulesScreen(
+        isFromHome: false,
+      ) // Index 2: Rules  Page
     ];
   }
 
   List<PersistentBottomNavBarItem> _navBarsItems() {
-    ThemeData theme = Theme.of(context);
-    Color activeColor = theme.colorScheme.primary;
-    Color inactiveColor = theme.colorScheme.onSurface.withOpacity(0.6);
+    AppTheme theme = AppTheme.of(context);
+    Color activeColor = theme.primary;
+    Color inactiveColor = Colors.grey;
 
     return [
       _buildNavBarItem(
@@ -86,12 +81,11 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
         tooltip: 'Chat',
       ),
       _buildNavBarItem(
-        icon: CupertinoIcons.square_list_fill,
-        route: AppRoutes.profile,
-        activeColor: activeColor,
-        inactiveColor: inactiveColor,
-        tooltip: 'Rules and Regulations'
-      )
+          icon: CupertinoIcons.square_list_fill,
+          route: AppRoutes.profile,
+          activeColor: activeColor,
+          inactiveColor: inactiveColor,
+          tooltip: 'Rules and Regulations')
     ];
   }
 

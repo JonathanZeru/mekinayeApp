@@ -2,11 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:mekinaye/config/themes/data/app_theme.dart';
 import 'package:mekinaye/screen/spareparts/spare_part_screen.dart';
 import 'package:mekinaye/screen/workshop/workshop_screen.dart';
 import 'package:mekinaye/screen/rules/rules_screen.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
 import '../../config/config_preference.dart';
 import '../../controller/connection/internet_connection_controller.dart';
@@ -28,6 +28,7 @@ import '../app_documentation/terms_and_conditions_screen.dart';
 import '../auth/login_screen.dart';
 import '../profile/profile_screen.dart';
 import '../../layout/error/error_screen.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -38,13 +39,13 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-
     AppTheme theme = AppTheme.of(context);
     final GlobalKey<SliderDrawerState> _sliderDrawerKey =
-    GlobalKey<SliderDrawerState>();
+        GlobalKey<SliderDrawerState>();
     late String title;
     final internetController = Get.put(InternetController());
-    if(internetController.hasConnection.value == false && internetController.checkingConnection.value == false){
+    if (internetController.hasConnection.value == false &&
+        internetController.checkingConnection.value == false) {
       return ErrorScreen(onPress: internetController.checkingConnection);
     }
     return SafeArea(
@@ -68,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: theme.primary,
                   size: 30.sp,
                 ),
-                onPressed: (){
+                onPressed: () {
                   _handleTelUrl("tel: 0954527580");
                 },
               ),
@@ -86,72 +87,70 @@ class _HomeScreenState extends State<HomeScreen> {
               color: theme.primaryBackground,
               child: SingleChildScrollView(
                   child: Column(
-                    children: [
-                      AdsCarousel(),
-                      GridView.builder(
-                          shrinkWrap: true,
-                          scrollDirection: Axis.vertical,
-                          physics: BouncingScrollPhysics(),
-                          itemCount: AppConstants.homeScreenGrid.length,
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              childAspectRatio: 1.3
-                          ),
-                          itemBuilder: (context, j) {
-                            return GestureDetector(
-                              onTap: (){
-                                switch(AppConstants.homeScreenGrid[j]['name']){
-                                  case "Ethio Spare":
-                                    Get.to(()=> WorkshopScreen());
-                                    break;
-                                  case "Ethio Garage":
-                                    Get.to(()=> SparePartScreen());
-                                    break;
-                                  case "Traffic Police":
-                                    Get.to(()=> RulesScreen());
-                                    break;
-                                  case "Gas Station":
-                                    Get.to(()=> MapScreen());
-                                    break;
-                                }
-
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Container(
-                                  height: 50,
-                                  width: 70,
-                                  decoration: BoxDecoration(
-                                    color: theme.accent1,
-                                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      // Icon(
-                                      //   AppConstants.homeScreenGrid[j]['icon'],
-                                      //   size: 50.sp,
-                                      //   color: Colors.black,
-                                      // ),
-                                      Image.asset(
-                                          AppConstants.homeScreenGrid[j]['image'],
-                                          width: 70,
-                                          height: 70
-                                      ),
-                                      Text(AppConstants.homeScreenGrid[j]['name']!,
-                                          style: theme.typography.titleMedium.copyWith(
-                                            color: Colors.black,
-                                          )
-                                      )
-                                    ],
-                                  ),
-                                ),
+                children: [
+                  AdsCarousel(),
+                  GridView.builder(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.vertical,
+                      physics: BouncingScrollPhysics(),
+                      itemCount: AppConstants.homeScreenGrid.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2, childAspectRatio: 1.3),
+                      itemBuilder: (context, j) {
+                        return GestureDetector(
+                          onTap: () {
+                            switch (AppConstants.homeScreenGrid[j]['name']) {
+                              case "Ethio Spare":
+                                Get.to(() => WorkshopScreen());
+                                break;
+                              case "Ethio Garage":
+                                Get.to(() => SparePartScreen());
+                                break;
+                              case "Traffic Police":
+                                pushNewScreen(context,
+                                    screen: RulesScreen(isFromHome: true));
+                                break;
+                              case "Gas Station":
+                                Get.to(() => MapScreen());
+                                break;
+                            }
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Container(
+                              height: 50,
+                              width: 70,
+                              decoration: BoxDecoration(
+                                color: theme.accent1,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20)),
                               ),
-                            );
-                          })
-                    ],
-                  )),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  // Icon(
+                                  //   AppConstants.homeScreenGrid[j]['icon'],
+                                  //   size: 50.sp,
+                                  //   color: Colors.black,
+                                  // ),
+                                  Image.asset(
+                                      AppConstants.homeScreenGrid[j]['image'],
+                                      width: 70,
+                                      height: 70),
+                                  Text(AppConstants.homeScreenGrid[j]['name']!,
+                                      style:
+                                          theme.typography.titleMedium.copyWith(
+                                        color: Colors.black,
+                                      ))
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      })
+                ],
+              )),
             )),
       )
 
@@ -185,17 +184,14 @@ class _SliderViewState extends State<_SliderView> {
     setState(() {
       isLoading = true;
     });
-    isLoggedIn =
-    await AuthService.isUserLoggedIn();
-    if(isLoggedIn){
+    isLoggedIn = await AuthService.isUserLoggedIn();
+    if (isLoggedIn) {
       final userProfile = ConfigPreference.getUserProfile();
       setState(() {
         user = userProfile;
       });
-    }else{
-      user = {
-        "login":"Please Login or Sign up"
-      };
+    } else {
+      user = {"login": "Please Login or Sign up"};
     }
     setState(() {
       isLoading = false;
@@ -218,51 +214,53 @@ class _SliderViewState extends State<_SliderView> {
               height: 80,
               decoration: BoxDecoration(
                   image: DecorationImage(
-                      image: AssetImage("assets/images/logo.png"))
-              ),
+                      image: AssetImage("assets/images/logo.png"))),
             ),
           ),
           const SizedBox(
             height: 20,
           ),
-          isLoading ? CircularProgressIndicator()
-              :
-          isLoggedIn ? Text(
-            '${user['firstName']} ${user['lastName']}',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-              fontSize: 30,
-            ),
-          ): Column(
-            children: [
-              Text(
-                '${user['login']}',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                ),
-              ),Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Button(
-                  text: "Login in",
-                  onPressed: () async {
-                    Get.to(() => LoginScreen());
-                  },
-                  options: ButtonOptions(
-                    width: double.infinity,
-                    height: 45.h,
-                    padding: EdgeInsets.all(10.h),
-                    textStyle: theme.typography.titleMedium
-                        .copyWith(color: theme.primaryBtnText),
-                  ),
-                ),
-              )
-            ],
-          ),
+          isLoading
+              ? CircularProgressIndicator()
+              : isLoggedIn
+                  ? Text(
+                      '${user['firstName']} ${user['lastName']}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 30,
+                      ),
+                    )
+                  : Column(
+                      children: [
+                        Text(
+                          '${user['login']}',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Button(
+                            text: "Login in",
+                            onPressed: () async {
+                              Get.to(() => LoginScreen());
+                            },
+                            options: ButtonOptions(
+                              width: double.infinity,
+                              height: 45.h,
+                              padding: EdgeInsets.all(10.h),
+                              textStyle: theme.typography.titleMedium
+                                  .copyWith(color: theme.primaryBtnText),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
           const SizedBox(
             height: 20,
           ),
@@ -375,7 +373,6 @@ class _SliderViewState extends State<_SliderView> {
                 }
               }))
               .toList(),
-
         ],
       ),
     );
@@ -389,9 +386,9 @@ class _SliderMenuItem extends StatelessWidget {
 
   const _SliderMenuItem(
       {Key? key,
-        required this.title,
-        required this.iconData,
-        required this.onTap})
+      required this.title,
+      required this.iconData,
+      required this.onTap})
       : super(key: key);
 
   @override

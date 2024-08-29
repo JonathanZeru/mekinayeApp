@@ -44,7 +44,7 @@
   <true/>
   <key>UIApplicationSupportsIndirectInputEvents</key>
   <true/>
-
+  
   <!-- Privacy Settings -->
   <key>NSMicrophoneUsageDescription</key>
   <string>We need your microphone access to record audio messages</string>

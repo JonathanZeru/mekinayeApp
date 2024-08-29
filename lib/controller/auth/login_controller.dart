@@ -14,9 +14,7 @@ import '../../util/app_routes.dart';
 import '../../widget/custom_snackbar.dart';
 import '../firebase/fcm_token_controller.dart';
 
-
 class LoginPageController extends GetxController {
-
   final TextEditingController userNameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final formKey = GlobalKey<FormState>();
@@ -32,10 +30,7 @@ class LoginPageController extends GetxController {
   Future<void> loginUser() async {
     isLoading.value = true;
     UserModel user = UserModel(
-      password: passwordController.text,
-      userName: userNameController.text
-    );
-
+        password: passwordController.text, userName: userNameController.text);
 
     var request = user.toUserJson();
     var jsonBody = jsonEncode(request);
@@ -85,5 +80,4 @@ class LoginPageController extends GetxController {
     );
     isLoading.value = false;
   }
-
 }

@@ -86,7 +86,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     route: '/signup',
                   ),
                   Button(
-                    showLoadingIndicator: loginController.apiCallStatus.value == ApiCallStatus.loading,
+                    showLoadingIndicator: loginController.apiCallStatus.value ==
+                        ApiCallStatus.loading,
                     text: "Guest Sign in",
                     onPressed: () async {
                       Get.offAllNamed(AppRoutes.initial);

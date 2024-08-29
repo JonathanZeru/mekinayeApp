@@ -48,8 +48,6 @@ class EditProfileController extends GetxController {
       return;
     }
 
-    String fullName = "${firstNameController.text} ${lastNameController.text}";
-
     UserModel user = UserModel(
       firstName: firstNameController.text,
       lastName: lastNameController.text,
@@ -61,15 +59,15 @@ class EditProfileController extends GetxController {
     Map<String, dynamic> userMap = user.toUpdate();
     var jsonBody = jsonEncode(userMap);
 
-    final accessToken = ConfigPreference.getAccessToken();
+    // final accessToken = ConfigPreference.getAccessToken();
     Map<String, dynamic> header = {
       'Content-Type': 'application/json',
-      "Authorization": "Bearer $accessToken"
+      // "Authorization": "Bearer $accessToken"
     };
 
     await ApiService.safeApiCall(
       "${AppConstants.url}/users/${id.value}/update-user",
-      headers: header,
+      // headers: header,
       RequestType.patch,
       data: jsonBody,
       onLoading: () {
