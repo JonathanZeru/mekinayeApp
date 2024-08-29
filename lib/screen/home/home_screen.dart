@@ -51,18 +51,17 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     return SafeArea(
       child: Scaffold(
-        backgroundColor: theme.primaryBackground,
+        backgroundColor: theme.cardBackground,
         body: SliderDrawer(
             appBar: SliderAppBar(
               drawerIconColor: theme.primary,
-              appBarColor: Color(0xFFF5F8FF),
+              appBarColor: theme.cardBackground,
               title: Container(
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
                     image: DecorationImage(
-                        image: AssetImage("assets/images/logo.png"))
-                ),
+                        image: AssetImage("assets/images/logo.png"))),
               ),
               trailing: IconButton(
                 icon: Icon(
@@ -74,18 +73,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   _handleTelUrl("tel: 0954527580");
                 },
               ),
-
             ),
             key: _sliderDrawerKey,
             sliderOpenSize: 220,
             slider: _SliderView(
               onItemClick: (title) {
                 _sliderDrawerKey.currentState!.closeSlider();
-
               },
             ),
             child: Container(
-              color: theme.primaryBackground,
+              color: theme.cardBackground,
               child: SingleChildScrollView(
                   child: Column(
                 children: [
@@ -153,15 +150,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               )),
             )),
-      )
-
-      ,
+      ),
     );
   }
 }
+
 void _handleTelUrl(String url) async {
   await launchUrl(Uri.parse(url));
 }
+
 class _SliderView extends StatefulWidget {
   final Function(String)? onItemClick;
 
@@ -178,6 +175,7 @@ class _SliderViewState extends State<_SliderView> {
     super.initState();
     checkLogin();
   }
+
   bool isLoading = true;
   bool isLoggedIn = false;
   late Map<String, dynamic> user;
@@ -198,6 +196,7 @@ class _SliderViewState extends State<_SliderView> {
       isLoading = false;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     AppTheme theme = AppTheme.of(context);
@@ -271,108 +270,112 @@ class _SliderViewState extends State<_SliderView> {
             Menu(Icons.list_alt, 'Terms and conditions'),
             Menu(Icons.question_mark, 'FAQ'),
             Menu(Icons.car_crash_outlined, 'About'),
-            isLoggedIn ? Menu(Icons.arrow_back_ios, 'LogOut') : Menu(Icons.login, 'Login in')
+            isLoggedIn
+                ? Menu(Icons.arrow_back_ios, 'LogOut')
+                : Menu(Icons.login, 'Login in')
           ]
               .map((menu) => _SliderMenuItem(
-              title: menu.title,
-              iconData: menu.iconData,
-              onTap: (String e) async {
-                if (e == "Profile") {
-                  if (isLoggedIn) {
-                    Get.to(() => ProfileScreen());
-                  } else {
-                    Get.to(() => LoginScreen());
-                  }
-                }
-                if (e == "Privacy policy") {
-                  Get.to(() => PrivacyPolicyScreen());
-                }
-                if (e == "Terms and conditions") {
-                  Get.to(() => TermsAndConditionsScreen());
-                }
-                if (e == "FAQ") {
-                  Get.to(() => FaqScreen());
-                }
-                if (e == "About") {
-                  Get.to(() => AboutScreen());
-                }
-                if (e == "LogOut") {
-                  if (isLoggedIn) {
-                    bool? logoutConfirmed = await showDialog<bool>(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text("Are you sure?",
-                              style: theme.typography.titleMedium.copyWith(
-                                  color: theme.primaryText, fontSize: 16.sp)),
-                          content: Text("Do you want to log out?",
-                              style: theme.typography.titleMedium.copyWith(
-                                  color: theme.primaryText, fontSize: 14.sp)),
-                          actions: [
-                            Button(
-                              text: "No",
-                              onPressed: () {
-                                Navigator.pop(context, false);
-                              },
-                              options: ButtonOptions(
-                                  height: 35.h,
-                                  width: 60.w,
-                                  color: theme.error,
-                                  textStyle: theme.typography.titleMedium
-                                      .copyWith(
-                                      color: theme.primaryBackground,
-                                      fontSize: 14.sp)),
-                            ),
-                            SizedBox(width: 10.w),
-                            Button(
-                              text: "Yes",
-                              onPressed: () {
-                                Navigator.pop(context, true);
-                              },
-                              options: ButtonOptions(
-                                  height: 35.h,
-                                  width: 60.w,
-                                  textStyle: theme.typography.titleMedium
-                                      .copyWith(
-                                      color: theme.primaryBackground,
-                                      fontSize: 14.sp)),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-
-                    if (logoutConfirmed == true) {
-                      final userProfile = ConfigPreference.getUserProfile();
-                      Map<String, dynamic> body = {
-                        "userId": userProfile['id'],
-                        "fcmToken": ""
-                      };
-
-                      await ApiService.safeApiCall(
-                        "${AppConstants.url}/users/update-token",
-                        RequestType.post,
-                        data: body,
-                        onLoading: () {},
-                        onSuccess: (response) {},
-                        onError: (error) {},
-                      );
-                      AuthService.logout();
-                      Get.offAllNamed(AppRoutes.login);
+                  title: menu.title,
+                  iconData: menu.iconData,
+                  onTap: (String e) async {
+                    if (e == "Profile") {
+                      if (isLoggedIn) {
+                        Get.to(() => ProfileScreen());
+                      } else {
+                        Get.to(() => LoginScreen());
+                      }
                     }
-                  } else {
-                    CustomSnackBar.showCustomSnackBar(
-                      title: 'Login',
-                      message: 'Please Login or Sign up',
-                      duration: Duration(seconds: 2),
-                    );
-                    Get.to(() => LoginScreen());
-                  }
-                }
-                if (e == "Login in") {
-                  Get.to(() => LoginScreen());
-                }
-              }))
+                    if (e == "Privacy policy") {
+                      Get.to(() => PrivacyPolicyScreen());
+                    }
+                    if (e == "Terms and conditions") {
+                      Get.to(() => TermsAndConditionsScreen());
+                    }
+                    if (e == "FAQ") {
+                      Get.to(() => FaqScreen());
+                    }
+                    if (e == "About") {
+                      Get.to(() => AboutScreen());
+                    }
+                    if (e == "LogOut") {
+                      if (isLoggedIn) {
+                        bool? logoutConfirmed = await showDialog<bool>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text("Are you sure?",
+                                  style: theme.typography.titleMedium.copyWith(
+                                      color: theme.primaryText,
+                                      fontSize: 16.sp)),
+                              content: Text("Do you want to log out?",
+                                  style: theme.typography.titleMedium.copyWith(
+                                      color: theme.primaryText,
+                                      fontSize: 14.sp)),
+                              actions: [
+                                Button(
+                                  text: "No",
+                                  onPressed: () {
+                                    Navigator.pop(context, false);
+                                  },
+                                  options: ButtonOptions(
+                                      height: 35.h,
+                                      width: 60.w,
+                                      color: theme.error,
+                                      textStyle: theme.typography.titleMedium
+                                          .copyWith(
+                                              color: theme.primaryBackground,
+                                              fontSize: 14.sp)),
+                                ),
+                                SizedBox(width: 10.w),
+                                Button(
+                                  text: "Yes",
+                                  onPressed: () {
+                                    Navigator.pop(context, true);
+                                  },
+                                  options: ButtonOptions(
+                                      height: 35.h,
+                                      width: 60.w,
+                                      textStyle: theme.typography.titleMedium
+                                          .copyWith(
+                                              color: theme.primaryBackground,
+                                              fontSize: 14.sp)),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+
+                        if (logoutConfirmed == true) {
+                          final userProfile = ConfigPreference.getUserProfile();
+                          Map<String, dynamic> body = {
+                            "userId": userProfile['id'],
+                            "fcmToken": ""
+                          };
+
+                          await ApiService.safeApiCall(
+                            "${AppConstants.url}/users/update-token",
+                            RequestType.post,
+                            data: body,
+                            onLoading: () {},
+                            onSuccess: (response) {},
+                            onError: (error) {},
+                          );
+                          AuthService.logout();
+                          Get.offAllNamed(AppRoutes.login);
+                        }
+                      } else {
+                        CustomSnackBar.showCustomSnackBar(
+                          title: 'Login',
+                          message: 'Please Login or Sign up',
+                          duration: Duration(seconds: 2),
+                        );
+                        Get.to(() => LoginScreen());
+                      }
+                    }
+                    if (e == "Login in") {
+                      Get.to(() => LoginScreen());
+                    }
+                  }))
               .toList(),
         ],
       ),
@@ -395,9 +398,7 @@ class _SliderMenuItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-        title: Text(title,
-            style: const TextStyle(
-                color: Colors.black)),
+        title: Text(title, style: const TextStyle(color: Colors.black)),
         leading: Icon(iconData, color: Colors.black),
         onTap: () => onTap?.call(title));
   }
