@@ -3,6 +3,8 @@ import 'package:mekinaye/model/api_exceptions.dart';
 import 'package:mekinaye/util/api_call_status.dart';
 import 'package:mekinaye/widget/error/error_card.dart';
 
+import 'loading.dart';
+
 class ApiCallWidget extends StatelessWidget {
   final Widget child;
   final ApiCallStatus status;
@@ -20,9 +22,9 @@ class ApiCallWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (status) {
       case ApiCallStatus.loading || ApiCallStatus.refresh:
-        return const Center(
+        return Center(
             child: SizedBox(
-                width: 50, height: 50, child: CircularProgressIndicator()));
+                width: 50, height: 50, child: Loading()));
       case ApiCallStatus.success:
         return child;
       case ApiCallStatus.error:

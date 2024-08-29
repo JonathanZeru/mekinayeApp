@@ -12,6 +12,7 @@ import '../../model/user.dart';
 import '../../service/authorization_service.dart';
 import '../../util/date.dart';
 import '../../widget/button.dart';
+import '../../widget/loading.dart';
 import '../auth/login_screen.dart';
 import '../message/message_screen.dart';
 
@@ -22,7 +23,9 @@ class ChatListScreen extends StatelessWidget {
     final controller = Get.put(ChatListController());
     AppTheme theme =AppTheme.of(context);
     if(internetController.hasConnection.value == false && internetController.checkingConnection.value == false){
-      return ErrorScreen(onPress: () async {
+      return ErrorScreen(
+          onPress: () async {
+            internetController.checkConnection();
         controller.isLoggedIn.value =
             await AuthService.isUserLoggedIn();
         bool isConnected = await InternetConnectionChecker().hasConnection;
@@ -40,7 +43,7 @@ class ChatListScreen extends StatelessWidget {
           },
           child:  Obx(() {
             if(controller.isLoading.value){
-              return Center(child: CircularProgressIndicator());
+              return Center(child: Loading());
             }
             if(controller.isLoggedIn.value == false){
               return Center(child: Column(
