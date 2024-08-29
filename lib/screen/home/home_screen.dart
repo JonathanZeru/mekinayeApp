@@ -21,6 +21,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../screen/map/map_screen.dart';
 import '../../widget/button.dart';
 import '../../widget/custom_snackbar.dart';
+import '../../widget/loading.dart';
 import '../app_documentation/about.dart';
 import '../app_documentation/faq_screen.dart';
 import '../app_documentation/privacy_policies_screen.dart';
@@ -221,7 +222,7 @@ class _SliderViewState extends State<_SliderView> {
             height: 20,
           ),
           isLoading
-              ? CircularProgressIndicator()
+              ? Center(child: Loading())
               : isLoggedIn
                   ? Text(
                       '${user['firstName']} ${user['lastName']}',

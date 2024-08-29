@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../controller/ads/ads_controller.dart';
+import '../../widget/loading.dart';
 
 class AdsCarousel extends StatefulWidget {
   const AdsCarousel({super.key});
@@ -38,7 +39,7 @@ class _AdsCarouselState extends State<AdsCarousel> {
             child: SizedBox(
               height: 40,
               width: 40,
-              child: CircularProgressIndicator(),
+              child: Loading(),
             ),
           );
         }
@@ -63,7 +64,7 @@ class _AdsCarouselState extends State<AdsCarousel> {
                                   child: SizedBox(
                                     height: 40,
                                     width: 40,
-                                    child: CircularProgressIndicator(),
+                                    child: Loading(),
                                   ),
                                 ),
                                 errorWidget: (context, url, error) => Icon(Icons.error),
