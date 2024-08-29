@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:mekinaye/layout/profile/general_layout.dart';
-import 'package:mekinaye/layout/profile/other_layout.dart';
 import 'package:mekinaye/widget/profile/profile_section_container.dart';
 
 class RouteList extends StatelessWidget {

@@ -1,5 +1,4 @@
-# Uncomment this line to define a global platform for your project
-# platform :ios, '12.0'
+platform :ios, '12.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -31,7 +30,18 @@ target 'Runner' do
   use_frameworks!
   use_modular_headers!
 
+  # Add Firebase SDK pods here
+  pod 'Firebase/Core'
+  pod 'Firebase/Auth'
+  pod 'Firebase/Firestore'
+  pod 'Firebase/Messaging'
+  pod 'GoogleSignIn'
+  
+  # Add PhoneNumberKit pod
+  pod 'PhoneNumberKit', '~> 3.4'
+
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+
   target 'RunnerTests' do
     inherit! :search_paths
   end

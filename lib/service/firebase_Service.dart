@@ -40,11 +40,9 @@ class FirebaseService {
     );
     await FirebaseMessaging.instance
         .setForegroundNotificationPresentationOptions(
-        alert: true, badge: true, sound: true);
+            alert: true, badge: true, sound: true);
 
     // Logger().i('User granted permission: ${settings.authorizationStatus}');
-
-
 
     /// Handle background messages by registering a onBackgroundMessage handler.
     FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
@@ -52,6 +50,7 @@ class FirebaseService {
     ///initialize local notification before using it
     initLocalNotifications();
     print("Foreground");
+
     /// To handle messages while your application is in the foreground, listen to the onMessage stream.
     FirebaseMessaging.onMessage.listen((message) {
       final notification = message.notification;
@@ -79,10 +78,12 @@ class FirebaseService {
                 importance: Importance.high,
                 priority: Priority.max,
                 icon: '@mipmap/ic_launcher',
-                sound: RawResourceAndroidNotificationSound('notification_sound'), // Custom sound
+                sound: RawResourceAndroidNotificationSound(
+                    'notification_sound'), // Custom sound
                 playSound: true,
                 enableVibration: true, // Enable vibration
-                vibrationPattern: Int64List.fromList([0, 500, 500, 500]), // Custom vibration pattern
+                vibrationPattern: Int64List.fromList(
+                    [0, 500, 500, 500]), // Custom vibration pattern
               ),
             ),
             payload: jsonEncode(message.toMap()));
@@ -97,58 +98,67 @@ class FirebaseService {
     FirebaseMessaging.instance.getToken().then((token) {
       Logger().i("FCM Token: $token");
       print("FCM Token: $token");
-      if(isLoggedIn) {
-
+      if (isLoggedIn) {
         final userProfile = ConfigPreference.getUserProfile();
         registerFCMToken(userProfile['id']);
       }
+
       /// Store the token on your server for sending targeted messages
     });
   }
+
   Future initLocalNotifications() async {
-    const iOS = DarwinInitializationSettings();
-    const android = AndroidInitializationSettings('ic_launcher');
+    // Android initialization settings
+    const android = AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    // iOS initialization settings
+    const iOS = DarwinInitializationSettings(
+      requestSoundPermission: true,
+      requestBadgePermission: true,
+      requestAlertPermission: true,
+    );
+
+    // Combine both Android and iOS initialization settings
     const setting = InitializationSettings(
       android: android,
       iOS: iOS,
     );
-    await _localNotifications.initialize(setting,
+
+    // Initialize local notifications
+    await _localNotifications.initialize(
+      setting,
       onDidReceiveNotificationResponse: (payload) {
         final message = RemoteMessage.fromMap(jsonDecode(payload as String));
         handleMessage(message);
       },
     );
+
+    // Request notifications permission on iOS
     final platform = _localNotifications.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
     await platform?.requestNotificationsPermission();
+
+    // Create the notification channel for Android
     await platform?.createNotificationChannel(_androidChannel);
   }
+
   Future<String> getFCMToken() async {
     return await FirebaseMessaging.instance.getToken() ?? "";
   }
+
   void registerFCMToken(int userId) async {
     final fcmToken = await getFCMToken();
-    Map<String, dynamic> body = {
-      "userId": userId,
-      "fcmToken": fcmToken
-    };
+    Map<String, dynamic> body = {"userId": userId, "fcmToken": fcmToken};
 
     await ApiService.safeApiCall(
       "${AppConstants.url}/users/update-token",
       RequestType.post,
       data: body,
-      onLoading: () {
-      },
-      onSuccess: (response) {
-
-      },
-      onError: (error) {
-
-      },
+      onLoading: () {},
+      onSuccess: (response) {},
+      onError: (error) {},
     );
   }
-
-
 }
 
 @pragma('vm:entry-point')
@@ -157,6 +167,7 @@ Future<void> handleBackgroundMessage(RemoteMessage message) async {
 }
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 ///for opening app from push notification
 @pragma('vm:entry-point')
 void handleMessage(RemoteMessage? message) {

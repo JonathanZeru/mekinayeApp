@@ -10,15 +10,15 @@ class UserModel {
   final String? type;
 
   UserModel({
-     this.id,
-     this.firstName,
-     this.lastName,
-     this.email,
-     this.password,
-     this.status,
-     this.userName,
-     this.phoneNumber,
-     this.type,
+    this.id,
+    this.firstName,
+    this.lastName,
+    this.email,
+    this.password,
+    this.status,
+    this.userName,
+    this.phoneNumber,
+    this.type,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -35,13 +35,12 @@ class UserModel {
   }
   factory UserModel.fromWorkShopJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['id'],
-      firstName: json['firstName'],
-      lastName: json['lastName'],
-      email: json['email'],
-      phoneNumber: json['phoneNumber'],
-      userName: json['userName']
-    );
+        id: json['id'],
+        firstName: json['firstName'],
+        lastName: json['lastName'],
+        email: json['email'],
+        phoneNumber: json['phoneNumber'],
+        userName: json['userName']);
   }
 
   Map<String, dynamic> toJson() {
@@ -56,29 +55,25 @@ class UserModel {
       'type': type,
     };
   }
+
   Map<String, dynamic> toUserJson() {
-    return {
-      'password': password,
-      'userName': userName
-    };
+    return {'password': password, 'userName': userName};
   }
-  Map<String, dynamic> toUpdate(){
+
+  Map<String, dynamic> toUpdate() {
     return {
-      'id': id,
       'firstName': firstName,
       'lastName': lastName,
-      'email': email,
-      'status': status,
-      'userName': userName,
-      'phoneNumber': phoneNumber,
+      'type': "buyer",
     };
   }
-  Map<String, dynamic> toGoogleSignInUpdate(){
+
+  Map<String, dynamic> toGoogleSignInUpdate() {
     return {
       'firstName': firstName,
       'lastName': lastName,
       'email': email,
-      'type': type,
+      'type': "buyer",
     };
   }
 }

@@ -24,11 +24,12 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final EditProfileController editProfileController =
-    Get.put(EditProfileController());
+        Get.put(EditProfileController());
     final userProfile = ConfigPreference.getUserProfile();
     final AppTheme appTheme = AppTheme.of(context);
     final internetController = Get.put(InternetController());
-    if(internetController.hasConnection.value == false && internetController.checkingConnection.value == false){
+    if (internetController.hasConnection.value == false &&
+        internetController.checkingConnection.value == false) {
       return ErrorScreen(onPress: internetController.checkingConnection);
     }
 
@@ -50,10 +51,8 @@ class ProfileScreen extends StatelessWidget {
           child: Column(
             children: [
               UserProfileHeader(
-                firstName:
-                editProfileController.fullNameController.text.split(" ")[0],
-                lastName:
-                editProfileController.fullNameController.text.split(" ")[1][0],
+                firstName: editProfileController.firstNameController.text,
+                lastName: editProfileController.lastNameController.text,
                 email: editProfileController.emailController.text,
               ),
               const SizedBox(height: 20),
@@ -64,85 +63,85 @@ class ProfileScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Button(
-                    showLoadingIndicator: false,
-                    text: "Log out",
-                    icon: Icon(Icons.logout, color: appTheme.primaryBackground),
-                    onPressed: () async {
-                      bool? logoutConfirmed = await showDialog<bool>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text("Are you sure?",
-                                style: appTheme.typography.titleMedium.copyWith(
-                                    color: appTheme.primaryText, fontSize: 16.sp)),
-                            content: Text("Do you want to log out?",
-                                style: appTheme.typography.titleMedium.copyWith(
-                                    color: appTheme.primaryText, fontSize: 14.sp)),
-                            actions: [
-                              Button(
-                                text: "No",
-                                onPressed: () {
-                                  Navigator.pop(context, false);
-                                },
-                                options: ButtonOptions(
-                                    height: 35.h,
-                                    width: 60.w,
-                                    color: appTheme.error,
-                                    textStyle: appTheme.typography.titleMedium
-                                        .copyWith(
-                                        color: appTheme.primaryBackground,
-                                        fontSize: 14.sp)),
-                              ),
-                              SizedBox(width: 10.w),
-                              Button(
-                                text: "Yes",
-                                onPressed: () {
-                                  Navigator.pop(context, true);
-                                },
-                                options: ButtonOptions(
-                                    height: 35.h,
-                                    width: 60.w,
-                                    textStyle: appTheme.typography.titleMedium
-                                        .copyWith(
-                                        color: appTheme.primaryBackground,
-                                        fontSize: 14.sp)),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-
-                      if (logoutConfirmed == true) {
-                        final userProfile = ConfigPreference.getUserProfile();
-                        Map<String, dynamic> body = {
-                          "userId": userProfile['id'],
-                          "fcmToken": ""
-                        };
-
-                        await ApiService.safeApiCall(
-                          "${AppConstants.url}/users/update-token",
-                          RequestType.post,
-                          data: body,
-                          onLoading: () {
-                          },
-                          onSuccess: (response) {
-
-                          },
-                          onError: (error) {
-
+                      showLoadingIndicator: false,
+                      text: "Log out",
+                      icon:
+                          Icon(Icons.logout, color: appTheme.primaryBackground),
+                      onPressed: () async {
+                        bool? logoutConfirmed = await showDialog<bool>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text("Are you sure?",
+                                  style: appTheme.typography.titleMedium
+                                      .copyWith(
+                                          color: appTheme.primaryText,
+                                          fontSize: 16.sp)),
+                              content: Text("Do you want to log out?",
+                                  style: appTheme.typography.titleMedium
+                                      .copyWith(
+                                          color: appTheme.primaryText,
+                                          fontSize: 14.sp)),
+                              actions: [
+                                Button(
+                                  text: "No",
+                                  onPressed: () {
+                                    Navigator.pop(context, false);
+                                  },
+                                  options: ButtonOptions(
+                                      height: 35.h,
+                                      width: 60.w,
+                                      color: appTheme.error,
+                                      textStyle: appTheme.typography.titleMedium
+                                          .copyWith(
+                                              color: appTheme.primaryBackground,
+                                              fontSize: 14.sp)),
+                                ),
+                                SizedBox(width: 10.w),
+                                Button(
+                                  text: "Yes",
+                                  onPressed: () {
+                                    Navigator.pop(context, true);
+                                  },
+                                  options: ButtonOptions(
+                                      height: 35.h,
+                                      width: 60.w,
+                                      textStyle: appTheme.typography.titleMedium
+                                          .copyWith(
+                                              color: appTheme.primaryBackground,
+                                              fontSize: 14.sp)),
+                                ),
+                              ],
+                            );
                           },
                         );
-                        AuthService.logout();
-                        Get.offAllNamed(AppRoutes.login);
-                      }
-                    },
-                    options: ButtonOptions(
-                      height: 45.h,
-                      padding: EdgeInsets.all(10.h),
-                      textStyle: appTheme.typography.titleMedium
-                          .copyWith(color: appTheme.primaryBackground),
+
+                        if (logoutConfirmed == true) {
+                          final userProfile = ConfigPreference.getUserProfile();
+                          Map<String, dynamic> body = {
+                            "userId": userProfile['id'],
+                            "fcmToken": ""
+                          };
+
+                          await ApiService.safeApiCall(
+                            "${AppConstants.url}/users/update-token",
+                            RequestType.post,
+                            data: body,
+                            onLoading: () {},
+                            onSuccess: (response) {},
+                            onError: (error) {},
+                          );
+                          AuthService.logout();
+                          Get.offAllNamed(AppRoutes.login);
+                        }
+                      },
+                      options: ButtonOptions(
+                        height: 45.h,
+                        padding: EdgeInsets.all(10.h),
+                        textStyle: appTheme.typography.titleMedium
+                            .copyWith(color: appTheme.primaryBackground),
+                      ),
                     ),
-                                    ),
                   ),
                   SizedBox(width: 10.h),
                   Expanded(
@@ -156,11 +155,16 @@ class ProfileScreen extends StatelessWidget {
                           builder: (BuildContext context) {
                             return AlertDialog(
                               title: Text("Are you sure?",
-                                  style: appTheme.typography.titleMedium.copyWith(
-                                      color: appTheme.primaryText, fontSize: 16.sp)),
-                              content: Text("Do you want to delete your account?",
-                                  style: appTheme.typography.titleMedium.copyWith(
-                                      color: appTheme.primaryText, fontSize: 14.sp)),
+                                  style: appTheme.typography.titleMedium
+                                      .copyWith(
+                                          color: appTheme.primaryText,
+                                          fontSize: 16.sp)),
+                              content: Text(
+                                  "Do you want to delete your account?",
+                                  style: appTheme.typography.titleMedium
+                                      .copyWith(
+                                          color: appTheme.primaryText,
+                                          fontSize: 14.sp)),
                               actions: [
                                 Button(
                                   text: "No",
@@ -175,8 +179,8 @@ class ProfileScreen extends StatelessWidget {
                                           color: appTheme.primary, width: 2),
                                       textStyle: appTheme.typography.titleMedium
                                           .copyWith(
-                                          color: appTheme.primaryBackground,
-                                          fontSize: 14.sp)),
+                                              color: appTheme.primaryBackground,
+                                              fontSize: 14.sp)),
                                 ),
                                 SizedBox(width: 10.w),
                                 Button(
@@ -189,8 +193,8 @@ class ProfileScreen extends StatelessWidget {
                                       width: 60.w,
                                       textStyle: appTheme.typography.titleMedium
                                           .copyWith(
-                                          color: appTheme.primaryBackground,
-                                          fontSize: 14.sp)),
+                                              color: appTheme.primaryBackground,
+                                              fontSize: 14.sp)),
                                 ),
                               ],
                             );
@@ -208,14 +212,9 @@ class ProfileScreen extends StatelessWidget {
                             "${AppConstants.url}/users/update-token",
                             RequestType.post,
                             data: body,
-                            onLoading: () {
-                            },
-                            onSuccess: (response) {
-
-                            },
-                            onError: (error) {
-
-                            },
+                            onLoading: () {},
+                            onSuccess: (response) {},
+                            onError: (error) {},
                           );
                           editProfileController.deleteAccount();
                           AuthService.logout();
@@ -225,14 +224,16 @@ class ProfileScreen extends StatelessWidget {
                       options: ButtonOptions(
                         elevation: 0,
                         color: Colors.transparent,
-                        borderSide: BorderSide(color: appTheme.primary, width: 2),
+                        borderSide:
+                            BorderSide(color: appTheme.primary, width: 2),
                         height: 45.h,
                         padding: EdgeInsets.all(10.h),
                         textStyle: appTheme.typography.titleMedium
                             .copyWith(color: appTheme.primary),
                       ),
                     ),
-                  ),],
+                  ),
+                ],
               )
             ],
           ),

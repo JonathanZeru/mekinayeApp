@@ -10,7 +10,8 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:logger/logger.dart';
 import 'package:mekinaye/util/app_constants.dart';
 import 'package:audioplayers/audioplayers.dart' as audioplayers;
-import 'package:flutter_sound/flutter_sound.dart' as flutter_sound; // Add this for voice recording
+import 'package:flutter_sound/flutter_sound.dart'
+    as flutter_sound; // Add this for voice recording
 
 import '../../config/config_preference.dart';
 import '../../model/api_exceptions.dart';
@@ -43,12 +44,11 @@ class MessageController extends GetxController {
   var msgScrolling = ScrollController();
   late UserModel receiverData;
 
-  flutter_sound.FlutterSoundRecorder? _recorder;  // Voice recorder
+  flutter_sound.FlutterSoundRecorder? _recorder; // Voice recorder
   RxBool isRecording = false.obs;
   Timer? messagePollingTimer;
   final apiCallStatus = ApiCallStatus.holding.obs;
   final apiException = ApiException().obs;
-
 
   RxBool hasConnection = true.obs;
   RxBool checkingConnection = true.obs;
@@ -57,19 +57,10 @@ class MessageController extends GetxController {
     super.onInit();
     userId.value = ConfigPreference.getUserProfile()['id'].toString();
     checkConnection();
-    _recorder = flutter_sound.FlutterSoundRecorder();
-    _recorder?.openRecorder();
-    audioPlayer.onPlayerStateChanged.listen((audioplayers.PlayerState state) {
-      if (state == audioplayers.PlayerState.completed) {
-        if (currentPlayingIndex != -1) {
-          isPlaying[currentPlayingIndex] = false;
-          currentPlayingIndex = -1;
-        }
-      }
-    });
 
     startMessagePolling();
   }
+
   Future<void> checkConnection() async {
     checkingConnection.value = true;
     final bool isConnected = await InternetConnectionChecker().hasConnection;
@@ -80,6 +71,7 @@ class MessageController extends GetxController {
     }
     checkingConnection.value = false;
   }
+
   void startMessagePolling() {
     messagePollingTimer = Timer.periodic(Duration(seconds: 3), (timer) {
       fetchMessages(receiverData);
@@ -89,6 +81,7 @@ class MessageController extends GetxController {
   void stopMessagePolling() {
     messagePollingTimer?.cancel();
   }
+
   @override
   void onClose() {
     _recorder?.closeRecorder();
@@ -115,46 +108,50 @@ class MessageController extends GetxController {
       // The permission is granted, you can start recording
     } else {
       // Permission is denied, handle accordingly
-      Get.snackbar('Permission Denied', 'Microphone permission is required to record audio.');
+      Get.snackbar('Permission Denied',
+          'Microphone permission is required to record audio.');
     }
   }
 
-  void startRecording() async {
-    final status = await Permission.microphone.status;
+  // void startRecording() async {
+  //   final status = await Permission.microphone.status;
 
-    if (!status.isGranted) {
-      // Inform the user that microphone access is needed
-      await requestMicrophonePermission();
-      Get.snackbar('Permission Required', 'Please grant microphone access to record audio.');
-      return;
-    }
+  //   if (!status.isGranted) {
+  //     // Inform the user that microphone access is needed
+  //     await requestMicrophonePermission();
+  //     Get.snackbar('Permission Required',
+  //         'Please grant microphone access to record audio.');
+  //     return;
+  //   }
 
-    try {
-      await _recorder?.startRecorder(toFile: 'voice_message.aac');
-      isRecording.value = true;
-      update();
-    } catch (e) {
-      // Handle the exception
-      print("Error starting recorder: $e");
-    }
-  }
+  //   try {
+  //     await _recorder?.startRecorder(toFile: 'voice_message.aac');
+  //     isRecording.value = true;
+  //     update();
+  //   } catch (e) {
+  //     // Handle the exception
+  //     print("Error starting recorder: $e");
+  //   }
+  // }
 
-  void stopRecording() async {
-    if (_recorder!.isRecording) {
-      String? path = await _recorder?.stopRecorder();
-      isRecording.value = false;
-      selectedAudio = File(path!);
-      sendMessage();
-      update();
-    }
-  }
+  // void stopRecording() async {
+  //   if (_recorder!.isRecording) {
+  //     String? path = await _recorder?.stopRecorder();
+  //     isRecording.value = false;
+  //     selectedAudio = File(path!);
+  //     sendMessage();
+  //     update();
+  //   }
+  // }
 
-  void setReceiverData(UserModel receiverDataModel){
+  void setReceiverData(UserModel receiverDataModel) {
     receiverData = receiverDataModel;
   }
+
   void fetchReceiverData(int ownerId) async {
     try {
-      final response = await http.get(Uri.parse('${AppConstants.url}/users/$ownerId'));
+      final response =
+          await http.get(Uri.parse('${AppConstants.url}/users/$ownerId'));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         receiverName.value = "${data['firstName']} ${data['lastName']}";
@@ -173,40 +170,38 @@ class MessageController extends GetxController {
   void fetchMessages(UserModel owner) async {
     checkConnection();
     receiverData = owner;
-    final accessToken = ConfigPreference.getAccessToken();
+    // final accessToken s= ConfigPreference.getAccessToken();
     Map<String, dynamic> userProfile = ConfigPreference.getUserProfile();
 
     try {
       final response = await http.get(
-        Uri.parse('${AppConstants.url}/messages/get-both-chats?senderId=${userProfile['id']}&receiverId=${receiverData.id}'),
-        headers: {
-          'Authorization': 'Bearer ${accessToken}',
-        },
+        Uri.parse(
+            '${AppConstants.url}/messages/get-both-chats?senderId=${userProfile['id']}&receiverId=${receiverData.id}'),
+        // headers: {
+        //   'Authorization': 'Bearer ${accessToken}',
+        // },
       );
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        messages.value = data.map((item) => Message.fromJson(item)).toList().reversed.toList();
+        messages.value = data
+            .map((item) => Message.fromJson(item))
+            .toList()
+            .reversed
+            .toList();
         isPlaying.value = List<bool>.filled(messages.length, false);
-      } else {
-        Get.snackbar('Error', 'Failed to fetch messages');
       }
-    } catch (e) {
-      Get.snackbar('Error', 'An error occurred: $e');
-    }
+    } catch (e) {}
   }
 
   Future<void> sendMessage() async {
-
-    final accessToken = await AuthService.getAuthorizationToken();
+    // final accessToken = await AuthService.getAuthorizationToken();
     final userProfile = ConfigPreference.getUserProfile();
 
-    if(selectedImage == null && selectedAudio==null){
+    if (selectedImage == null && selectedAudio == null) {
       await ApiService.safeApiCall(
         "${AppConstants.url}/messages/send",
         RequestType.post,
-        headers: {
-          "Authorization": "Bearer $accessToken"
-        },
+        // headers: {"Authorization": "Bearer $accessToken"},
         data: jsonEncode({
           "text": textController.text.isNotEmpty ? textController.text : "",
           "image": null,
@@ -221,7 +216,7 @@ class MessageController extends GetxController {
         },
         onSuccess: (response) async {
           var responseData = response.data;
-
+          print("message sent");
           apiCallStatus.value = ApiCallStatus.success;
           textController.clear();
           selectedImage = null;
@@ -242,21 +237,21 @@ class MessageController extends GetxController {
           update();
         },
       );
-    }else{
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse('${AppConstants.url}/messages/send'),
-    );
+    } else {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('${AppConstants.url}/messages/send'),
+      );
 
-    request.headers['Authorization'] = 'Bearer $accessToken';
+      // request.headers['Authorization'] = 'Bearer $accessToken';
 
-    request.fields['senderId'] = userProfile['id'].toString();
-    request.fields['receiverId'] = receiverData.id.toString();
-    request.fields['senderUsername'] = userProfile['userName'];
-    request.fields['receiverUsername'] = receiverData.userName!;
-    request.fields['text'] = "null";
+      request.fields['senderId'] = userProfile['id'].toString();
+      request.fields['receiverId'] = receiverData.id.toString();
+      request.fields['senderUsername'] = userProfile['userName'];
+      request.fields['receiverUsername'] = receiverData.userName!;
+      request.fields['text'] = "null";
 
-    // Handle image attachment
+      // Handle image attachment
       // Handle image attachment
       if (selectedImage != null) {
         var imageStream = http.ByteStream(selectedImage!.openRead());
@@ -291,26 +286,22 @@ class MessageController extends GetxController {
         request.fields['audio'] = "null";
       }
 
+      try {
+        var response = await request.send();
+        var responseString = await response.stream.bytesToString();
 
-    try {
-      var response = await request.send();
-      var responseString = await response.stream.bytesToString();
+        if (response.statusCode == 201) {
+          textController.clear();
+          selectedImage = null;
+          selectedAudio = null;
+          fetchMessages(receiverData);
+        } else {}
 
-      if (response.statusCode == 201) {
-        textController.clear();
-        selectedImage = null;
-        selectedAudio = null;
-        fetchMessages(receiverData);
-      } else {
-
+        // return http.Response(responseString, response.statusCode);
+      } catch (e) {
+        Get.snackbar('Error', 'An error occurred: $e');
+        // return http.Response("Error", 500);
       }
-
-      // return http.Response(responseString, response.statusCode);
-
-    } catch (e) {
-      Get.snackbar('Error', 'An error occurred: $e');
-      // return http.Response("Error", 500);
-    }
     }
   }
 

@@ -19,22 +19,24 @@ class ChatListController extends GetxController {
   Future<void> onInit() async {
     super.onInit();
     isLoading.value = true;
-    isLoggedIn.value =
-        await AuthService.isUserLoggedIn();
-    if(isLoggedIn.value) {
+    isLoggedIn.value = await AuthService.isUserLoggedIn();
+    if (isLoggedIn.value) {
       fetchUsersAndLastMessages();
     }
   }
 
   Future<void> fetchUsersAndLastMessages() async {
-    final accessToken = ConfigPreference.getAccessToken();
+    // final accessToken = ConfigPreference.getAccessToken();
+
+    Map<String, dynamic> userProfile = ConfigPreference.getUserProfile();
 
     try {
       final response = await http.get(
-        Uri.parse('${AppConstants.url}/messages/get-chats'),
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-        },
+        Uri.parse(
+            '${AppConstants.url}/messages/get-chats?id=${userProfile['id']}'),
+        // headers: {
+        //   'Authorization': 'Bearer $accessToken',
+        // },
       );
 
       if (response.statusCode == 200) {

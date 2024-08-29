@@ -14,14 +14,13 @@ import '../../util/app_routes.dart';
 import '../../widget/custom_snackbar.dart';
 import '../firebase/fcm_token_controller.dart';
 
-
 class LoginPageController extends GetxController {
-
   final TextEditingController userNameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final formKey = GlobalKey<FormState>();
   final ValueNotifier<bool> obscurePassword = ValueNotifier<bool>(false);
   final apiCallStatus = ApiCallStatus.holding.obs;
+  final RxBool isLoading = false.obs;
   final apiException = ApiException().obs;
   final e = ApiException().obs;
   ApiException get getApiException => e.value;
@@ -29,11 +28,9 @@ class LoginPageController extends GetxController {
   final _fcmTokenController = Get.put(FcmTokenController());
 
   Future<void> loginUser() async {
+    isLoading.value = true;
     UserModel user = UserModel(
-      password: passwordController.text,
-      userName: userNameController.text
-    );
-
+        password: passwordController.text, userName: userNameController.text);
 
     var request = user.toUserJson();
     var jsonBody = jsonEncode(request);
@@ -43,6 +40,7 @@ class LoginPageController extends GetxController {
       RequestType.post,
       data: jsonBody,
       onLoading: () {
+        isLoading.value = true;
         apiCallStatus.value = ApiCallStatus.loading;
         update();
       },
@@ -63,19 +61,22 @@ class LoginPageController extends GetxController {
           message: 'Login Successful',
           duration: Duration(seconds: 2),
         );
+        isLoading.value = false;
         Get.offAllNamed(AppRoutes.initial);
         update();
       },
       onError: (error) {
+        isLoading.value = false;
         apiCallStatus.value = ApiCallStatus.error;
+        isLoading.value = false;
         CustomSnackBar.showCustomErrorToast(
           title: 'Error',
           message: 'Login Error',
           duration: Duration(seconds: 2),
         );
+        isLoading.value = false;
         update();
       },
     );
   }
-
 }

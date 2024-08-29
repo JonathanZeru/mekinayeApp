@@ -1,6 +1,5 @@
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:mekinaye/config/config_preference.dart';
@@ -19,7 +18,6 @@ final navigatorKey = GlobalKey<NavigatorState>();
 
 // ...
 
-
 Future<void> main() async {
   /// wait for bindings
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,15 +30,13 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  bool isLoggedIn =
-  await AuthService.isUserLoggedIn();
+  bool isLoggedIn = await AuthService.isUserLoggedIn();
 
   print("here");
   await FirebaseService().init(isLoggedIn);
   print("here");
+
   /// check if user is logged in//Todo move to splash screen
-  /// initializing flutter downloader
-  FlutterDownloader.initialize(debug: true);
 
   runApp(MyApp(
     isLoggedIn: isLoggedIn,
@@ -66,23 +62,23 @@ class MyApp extends StatelessWidget {
             getPages: AppRoutes.pages,
             routes: {
               '/messageScreen': (context) {
-                final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+                final args = ModalRoute.of(context)?.settings.arguments
+                    as Map<String, dynamic>;
                 print("args = $args");
-                return MessagingScreen(ownerId: 0, owner: UserModel(), args: args);
-        }, // Replace with actual data or use arguments
+                return MessagingScreen(
+                    ownerId: 0, owner: UserModel(), args: args);
+              }, // Replace with actual data or use arguments
             },
             onGenerateRoute: (settings) {
               if (settings.name == '/messageScreen') {
-                final messageId = settings.arguments as int; // Adjust type based on your arguments
+                final messageId = settings.arguments
+                    as int; // Adjust type based on your arguments
                 return MaterialPageRoute(
                   builder: (context) => MessagingScreen(
-                    // Pass the messageId or other data here
-                    ownerId: messageId,
-                    owner: UserModel(),
-                    args: {
-                    'isFromNotification': false
-                  }
-                  ),
+                      // Pass the messageId or other data here
+                      ownerId: messageId,
+                      owner: UserModel(),
+                      args: {'isFromNotification': false}),
                 );
               }
               return null;

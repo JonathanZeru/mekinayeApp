@@ -2,9 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:logger/logger.dart';
 import 'package:mekinaye/config/localization/localization_manager.dart';
-import 'package:mekinaye/service/authorization_service.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ConfigPreference {
@@ -30,6 +29,7 @@ class ConfigPreference {
   static const String _updatedAtKey = 'updated_at';
   static const String _accessTokenKey = 'access_token';
   RxBool hasConnection = true.obs;
+
   /// Initialize SharedPreferences
   static Future<void> init() async {
     _sharedPreferences = await SharedPreferences.getInstance();
@@ -66,12 +66,12 @@ class ConfigPreference {
   Future<void> checkConnection() async {
     final bool isConnected = await InternetConnectionChecker().hasConnection;
     if (isConnected) {
-      print("get connection");
       hasConnection.value = true;
     } else {
       hasConnection.value = false;
     }
   }
+
   /// Set first launch to completed
   static Future<void> setFirstLaunchCompleted() =>
       _sharedPreferences.setBool(_isFirstLaunchKey, false);
@@ -84,12 +84,15 @@ class ConfigPreference {
     await _sharedPreferences.setString(_emailKey, userData['email']);
     // await _sharedPreferences.setInt(_statusKey, userData['status']);
     await _sharedPreferences.setString(_userNameKey, userData['userName']);
-    await _sharedPreferences.setString(_phoneNumberKey, userData['phoneNumber']);
+    await _sharedPreferences.setString(
+        _phoneNumberKey, userData['phoneNumber']);
     await _sharedPreferences.setString(_typeKey, userData['type']);
     await _sharedPreferences.setString(_createdAtKey, userData['createdAt']);
     await _sharedPreferences.setString(_updatedAtKey, userData['updatedAt']);
   }
-  static Future<void> storeUserGoogleProfile(Map<String, dynamic> userData) async {
+
+  static Future<void> storeUserGoogleProfile(
+      Map<String, dynamic> userData) async {
     await _sharedPreferences.setInt(_idKey, userData['id']);
     await _sharedPreferences.setString(_firstNameKey, userData['firstName']);
     await _sharedPreferences.setString(_lastNameKey, userData['lastName']);
@@ -101,6 +104,7 @@ class ConfigPreference {
     // await _sharedPreferences.setString(_createdAtKey, userData['createdAt']);
     // await _sharedPreferences.setString(_updatedAtKey, userData['updatedAt']);
   }
+
   /// Get user profile information
   static Map<String, dynamic> getUserProfile() {
     return {
@@ -122,7 +126,8 @@ class ConfigPreference {
     await _sharedPreferences.setString(_accessTokenKey, accessToken);
   }
 
-  static String? getAccessToken() => _sharedPreferences.getString(_accessTokenKey);
+  static String? getAccessToken() =>
+      _sharedPreferences.getString(_accessTokenKey);
 
   static Future<int> decodeTokenAndGetId() async {
     String? token = getAccessToken();

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../config/config_preference.dart';
@@ -22,7 +21,8 @@ class GoogleSignInController extends GetxController {
   final RxString errorMessage = "".obs;
   final _fcmTokenController = Get.put(FcmTokenController());
 
-  final FirebaseService _firebaseService = FirebaseService(); // Initialize FirebaseService
+  final FirebaseService _firebaseService =
+      FirebaseService(); // Initialize FirebaseService
 
   Future<void> handleGoogleSignIn() async {
     try {
@@ -37,18 +37,10 @@ class GoogleSignInController extends GetxController {
       // Trigger the authentication flow
       var googleUser = await googleSignIn.signIn();
       if (googleUser != null) {
-        final gAuthentication = await googleUser.authentication;
-
-        final credential = GoogleAuthProvider.credential(
-          idToken: gAuthentication.idToken,
-          accessToken: gAuthentication.accessToken,
-        );
-
-        String id = googleUser.id;
-        String photoUrl = googleUser.photoUrl ?? "";
         List<String>? nameParts = googleUser.displayName?.split(' ');
         String firstName = nameParts![0];
-        String lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+        String lastName =
+            nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
 
         UserModel userJson = UserModel(
           firstName: firstName,
@@ -75,25 +67,26 @@ class GoogleSignInController extends GetxController {
           },
           onSuccess: (response) async {
             var responseData = response.data;
-
-            if (responseData.containsKey('token')) {
+            if (responseData['message'] == "Authentication successful") {
               String token = responseData['token'];
               await AuthService.setAuthorizationToken(token);
-              await ConfigPreference.storeUserGoogleProfile(responseData['user']);
+              await ConfigPreference.storeUserGoogleProfile(
+                  responseData['user']);
               _fcmTokenController.registerFCMToken(responseData['user']['id']);
               await ConfigPreference.storeAccessToken(token);
 
               apiCallStatus.value = ApiCallStatus.success;
               CustomSnackBar.showCustomSnackBar(
                 title: 'Success',
-                message: 'Login Successful',
+                message: 'Authentication Successful',
                 duration: Duration(seconds: 2),
               );
               Get.offAllNamed(AppRoutes.initial);
-            } else if (responseData.containsKey('accessToken')) {
+            } else {
               String token = responseData['accessToken'];
               await AuthService.setAuthorizationToken(token);
-              await ConfigPreference.storeUserGoogleProfile(responseData['data']);
+              await ConfigPreference.storeUserGoogleProfile(
+                  responseData['data']);
               _fcmTokenController.registerFCMToken(responseData['data']['id']);
               await ConfigPreference.storeAccessToken(token);
 
@@ -105,6 +98,7 @@ class GoogleSignInController extends GetxController {
               );
               Get.offAllNamed(AppRoutes.initial);
             }
+
             update();
           },
           onError: (error) {

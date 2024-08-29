@@ -1,0 +1,1 @@
+ /Users/ytk/Downloads/mekinaye/mekinayeApp/.dart_tool/flutter_build/7884e16256ddf9824fc4455a8b9f2878/native_assets.yaml: 
