@@ -13,7 +13,6 @@ class ChatList extends GetView<MessageController> {
   Widget build(BuildContext context) {
     return Obx(
           () => Container(
-        padding: EdgeInsets.only(bottom: 60),
         child: CustomScrollView(
           reverse: true,
           controller: controller.msgScrolling,

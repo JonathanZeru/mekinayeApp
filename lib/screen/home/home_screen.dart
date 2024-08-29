@@ -21,6 +21,10 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../screen/map/map_screen.dart';
 import '../../widget/button.dart';
 import '../../widget/custom_snackbar.dart';
+import '../app_documentation/about.dart';
+import '../app_documentation/faq_screen.dart';
+import '../app_documentation/privacy_policies_screen.dart';
+import '../app_documentation/terms_and_conditions_screen.dart';
 import '../auth/login_screen.dart';
 import '../profile/profile_screen.dart';
 import '../../layout/error/error_screen.dart';
@@ -48,21 +52,20 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: theme.primaryBackground,
         body: SliderDrawer(
             appBar: SliderAppBar(
-              appBarColor: theme.primary,
-              title: ClipOval(
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage("assets/images/logo.png"))
-                  ),
+              drawerIconColor: theme.primary,
+              appBarColor: Color(0xFFF5F8FF),
+              title: Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage("assets/images/logo.png"))
                 ),
               ),
               trailing: IconButton(
                 icon: Icon(
                   CupertinoIcons.phone_solid,
-                  color: Colors.white,
+                  color: theme.primary,
                   size: 30.sp,
                 ),
                 onPressed: (){
@@ -72,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             ),
             key: _sliderDrawerKey,
-            sliderOpenSize: 179,
+            sliderOpenSize: 220,
             slider: _SliderView(
               onItemClick: (title) {
                 _sliderDrawerKey.currentState!.closeSlider();
@@ -268,92 +271,97 @@ class _SliderViewState extends State<_SliderView> {
             Menu(Icons.info, 'Privacy policy'),
             Menu(Icons.list_alt, 'Terms and conditions'),
             Menu(Icons.question_mark, 'FAQ'),
-            Menu(Icons.settings, 'Setting'),
-            isLoggedIn ? Menu(Icons.arrow_back_ios, 'LogOut') :
-            Menu(Icons.login, 'Login in')
+            Menu(Icons.car_crash_outlined, 'About'),
+            isLoggedIn ? Menu(Icons.arrow_back_ios, 'LogOut') : Menu(Icons.login, 'Login in')
           ]
               .map((menu) => _SliderMenuItem(
               title: menu.title,
               iconData: menu.iconData,
               onTap: (String e) async {
-                if(e == "Profile"){
-                  if(isLoggedIn){
-                    Get.to(()=> ProfileScreen());
-                  }else{
+                if (e == "Profile") {
+                  if (isLoggedIn) {
+                    Get.to(() => ProfileScreen());
+                  } else {
                     Get.to(() => LoginScreen());
                   }
                 }
-                if(e == "LogOut"){
-                  if(isLoggedIn){
-                      bool? logoutConfirmed = await showDialog<bool>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text("Are you sure?",
-                                style: theme.typography.titleMedium.copyWith(
-                                    color: theme.primaryText, fontSize: 16.sp)),
-                            content: Text("Do you want to log out?",
-                                style: theme.typography.titleMedium.copyWith(
-                                    color: theme.primaryText, fontSize: 14.sp)),
-                            actions: [
-                              Button(
-                                text: "No",
-                                onPressed: () {
-                                  Navigator.pop(context, false);
-                                },
-                                options: ButtonOptions(
-                                    height: 35.h,
-                                    width: 60.w,
-                                    color: theme.error,
-                                    textStyle: theme.typography.titleMedium
-                                        .copyWith(
-                                        color: theme.primaryBackground,
-                                        fontSize: 14.sp)),
-                              ),
-                              SizedBox(width: 10.w),
-                              Button(
-                                text: "Yes",
-                                onPressed: () {
-                                  Navigator.pop(context, true);
-                                },
-                                options: ButtonOptions(
-                                    height: 35.h,
-                                    width: 60.w,
-                                    textStyle: theme.typography.titleMedium
-                                        .copyWith(
-                                        color: theme.primaryBackground,
-                                        fontSize: 14.sp)),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-
-                      if (logoutConfirmed == true) {
-                        final userProfile = ConfigPreference.getUserProfile();
-                        Map<String, dynamic> body = {
-                          "userId": userProfile['id'],
-                          "fcmToken": ""
-                        };
-
-                        await ApiService.safeApiCall(
-                          "${AppConstants.url}/users/update-token",
-                          RequestType.post,
-                          data: body,
-                          onLoading: () {
-                          },
-                          onSuccess: (response) {
-
-                          },
-                          onError: (error) {
-
-                          },
+                if (e == "Privacy policy") {
+                  Get.to(() => PrivacyPolicyScreen());
+                }
+                if (e == "Terms and conditions") {
+                  Get.to(() => TermsAndConditionsScreen());
+                }
+                if (e == "FAQ") {
+                  Get.to(() => FaqScreen());
+                }
+                if (e == "About") {
+                  Get.to(() => AboutScreen());
+                }
+                if (e == "LogOut") {
+                  if (isLoggedIn) {
+                    bool? logoutConfirmed = await showDialog<bool>(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text("Are you sure?",
+                              style: theme.typography.titleMedium.copyWith(
+                                  color: theme.primaryText, fontSize: 16.sp)),
+                          content: Text("Do you want to log out?",
+                              style: theme.typography.titleMedium.copyWith(
+                                  color: theme.primaryText, fontSize: 14.sp)),
+                          actions: [
+                            Button(
+                              text: "No",
+                              onPressed: () {
+                                Navigator.pop(context, false);
+                              },
+                              options: ButtonOptions(
+                                  height: 35.h,
+                                  width: 60.w,
+                                  color: theme.error,
+                                  textStyle: theme.typography.titleMedium
+                                      .copyWith(
+                                      color: theme.primaryBackground,
+                                      fontSize: 14.sp)),
+                            ),
+                            SizedBox(width: 10.w),
+                            Button(
+                              text: "Yes",
+                              onPressed: () {
+                                Navigator.pop(context, true);
+                              },
+                              options: ButtonOptions(
+                                  height: 35.h,
+                                  width: 60.w,
+                                  textStyle: theme.typography.titleMedium
+                                      .copyWith(
+                                      color: theme.primaryBackground,
+                                      fontSize: 14.sp)),
+                            ),
+                          ],
                         );
-                        AuthService.logout();
-                        Get.offAllNamed(AppRoutes.login);
-                      }
+                      },
+                    );
 
-                  }else{
+                    if (logoutConfirmed == true) {
+                      final userProfile = ConfigPreference.getUserProfile();
+                      Map<String, dynamic> body = {
+                        "userId": userProfile['id'],
+                        "fcmToken": ""
+                      };
+
+                      await ApiService.safeApiCall(
+                        "${AppConstants.url}/users/update-token",
+                        RequestType.post,
+                        data: body,
+                        onLoading: () {},
+                        onSuccess: (response) {},
+                        onError: (error) {},
+                      );
+                      AuthService.logout();
+                      Get.offAllNamed(AppRoutes.login);
+                    }
+                  } else {
                     CustomSnackBar.showCustomSnackBar(
                       title: 'Login',
                       message: 'Please Login or Sign up',
@@ -362,11 +370,12 @@ class _SliderViewState extends State<_SliderView> {
                     Get.to(() => LoginScreen());
                   }
                 }
-                if(e == "Login in"){
+                if (e == "Login in") {
                   Get.to(() => LoginScreen());
                 }
               }))
               .toList(),
+
         ],
       ),
     );
@@ -390,7 +399,7 @@ class _SliderMenuItem extends StatelessWidget {
     return ListTile(
         title: Text(title,
             style: const TextStyle(
-                color: Colors.black, fontFamily: 'BalsamiqSans_Regular')),
+                color: Colors.black)),
         leading: Icon(iconData, color: Colors.black),
         onTap: () => onTap?.call(title));
   }

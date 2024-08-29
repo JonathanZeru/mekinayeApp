@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'dart:convert';
 
 import '../../model/message.dart';
@@ -21,20 +22,26 @@ class ChatListController extends GetxController {
     isLoading.value = true;
     isLoggedIn.value =
         await AuthService.isUserLoggedIn();
-    if(isLoggedIn.value) {
-      fetchUsersAndLastMessages();
+    bool isConnected = await InternetConnectionChecker().hasConnection;
+    if(isConnected){
+      if(isLoggedIn.value) {
+        fetchUsersAndLastMessages();
+      }
     }
   }
 
   Future<void> fetchUsersAndLastMessages() async {
-    final accessToken = ConfigPreference.getAccessToken();
+    // final accessToken = ConfigPreference.getAccessToken();
+
+    Map<String, dynamic> userProfile = ConfigPreference.getUserProfile();
+
 
     try {
       final response = await http.get(
-        Uri.parse('${AppConstants.url}/messages/get-chats'),
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-        },
+        Uri.parse('${AppConstants.url}/messages/get-chats?id=${userProfile['id']}'),
+        // headers: {
+        //   'Authorization': 'Bearer $accessToken',
+        // },
       );
 
       if (response.statusCode == 200) {

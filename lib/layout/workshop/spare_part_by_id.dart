@@ -109,17 +109,17 @@ class SingleSparePartScreen extends StatelessWidget {
                           ),
                           Text(
                             sparePart.description,
-                            style: theme.typography.bodyMedium.copyWith(
-                              color: theme.primaryText,
-                              fontSize: 14.0,
+                            style: theme.typography.titleMedium.copyWith(
+                                color: theme.primaryText,
+                                fontSize: 14.0,
                             ),
                           ),
                           SizedBox(height: 8.h),
                           Text(
                             'Price: \$${sparePart.price.toStringAsFixed(2)}',
-                            style: theme.typography.bodyMedium.copyWith(
+                            style: theme.typography.titleMedium.copyWith(
                               color: theme.primaryText,
-                              fontSize: 16.0,
+                              fontSize: 15.0,
                             ),
                           ),
                         ],

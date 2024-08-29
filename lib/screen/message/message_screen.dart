@@ -1,3 +1,6 @@
+import 'dart:ffi';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mekinaye/config/themes/data/app_theme.dart';
@@ -6,8 +9,14 @@ import '../../controller/message/message_controller.dart';
 import '../../layout/error/error_screen.dart';
 import '../../layout/message/chat_list.dart';
 import '../../model/user.dart';
-import 'package:audioplayers/audioplayers.dart';
 
+import 'dart:io';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
+import 'package:record/record.dart';
+import 'package:http/http.dart' as http;
+
+import '../../util/app_constants.dart';
 class MessagingScreen extends StatefulWidget {
   final int ownerId;
   final UserModel owner;
@@ -21,52 +30,8 @@ class MessagingScreen extends StatefulWidget {
 
 class _MessagingScreenState extends State<MessagingScreen> {
   final controller = Get.put(MessageController());
-  // late Record audioRecord;
-  // late AudioPlayer audioPlayer;
-  // bool isRecording = false;
-  // String audioPath = "";
-  //
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   audioPlayer = AudioPlayer();
-  // }
-  //
-  // @override
-  // void dispose() {
-  //   super.dispose();
-  //   audioRecord.dispose();
-  //   audioPlayer.dispose();
-  // }
-  // bool playing=false;
-  // Future<void> startRecording() async {
-  //   try {
-  //     print("START RECODING+++++++++++++++++++++++++++++++++++++++++++++++++");
-  //     if (await audioRecord.hasPermission()) {
-  //
-  //       await audioRecord.start();
-  //       setState(() {
-  //         isRecording = true;
-  //       });
-  //     }
-  //   } catch (e, stackTrace) {
-  //     print("START RECODING+++++++++++++++++++++${e}++++++++++${stackTrace}+++++++++++++++++");
-  //   }
-  // }
-  //
-  // Future<void> stopRecording() async {
-  //   try {
-  //     print("STOP RECODING+++++++++++++++++++++++++++++++++++++++++++++++++");
-  //     String? path = await audioRecord.stop();
-  //     setState(() {
-  //       recoding_now=false;
-  //       isRecording = false;
-  //       audioPath = path!;
-  //     });
-  //   } catch (e) {
-  //     print("STOP RECODING+++++++++++++++++++++${e}+++++++++++++++++++++++++++");
-  //   }
-  // }
+  bool isSending = false;
+  bool recodingNow = true;
   @override
   Widget build(BuildContext context) {
     final internetController = Get.put(InternetController());
@@ -84,76 +49,123 @@ class _MessagingScreenState extends State<MessagingScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text("${controller.receiverData.firstName!} ${controller.receiverData.lastName!}")
+          title: Text("${controller.receiverData.firstName!} ${controller.receiverData.lastName!}"),
         ),
-        body: SafeArea(
-          child: ConstrainedBox(
-            constraints: BoxConstraints.expand(),
-            child: Stack(
-              children: [
-                ChatList(),
-                Positioned(
-                  bottom: 0,
-                  height: 60,
-                  child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    padding: EdgeInsets.all(10),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            textAlignVertical: TextAlignVertical.center,
-                            textAlign: TextAlign.left,
-                            keyboardType: TextInputType.text,
-                            maxLines: 2,
-                            controller: controller.textController,
-                            decoration: InputDecoration(
-                              hintText: "Send messages...",
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        IconButton(
+        body: Column(
+          children: [
+            Expanded(
+              child: ChatList(),
+            ),
+        isSending
+            ? Container(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Sending audio...'),
+              SizedBox(height: 10),
+              LinearProgressIndicator(
+                  value: controller.uploadProgress.value
+              ),
+            ],
+          ),
+        )
+            : Container(),
+            Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: TextField(
+                      textAlignVertical: TextAlignVertical.center,
+                      textAlign: TextAlign.left,
+                      keyboardType: TextInputType.text,
+                      minLines: 1,
+                      maxLines: 6,
+                      controller: controller.textController,
+                      decoration: InputDecoration(
+                        fillColor: Colors.transparent,
+                        prefixIcon: IconButton(
                           icon: Icon(Icons.photo, size: 25, color: Colors.blue),
                           onPressed: () {
                             showPicker(context);
                           },
                         ),
-                        SizedBox(width: 10),
-                        // Obx(()
-                        // {
-                        //   if(controller.isRecording.value){
-                        //     return IconButton(
-                        //       icon: Icon(Icons.stop, size: 25, color: Colors.red),
-                        //       onPressed: controller.stopRecording,
-                        //     );
-                        //
-                        //   }else{
-                        //     return IconButton(
-                        //       icon: Icon(Icons.mic, size: 25, color: Colors.blue),
-                        //       onPressed: controller.startRecording,
-                        //     );
-                        //   }
-                        // }),
-                        IconButton(
-                          icon: Icon(Icons.send, size: 25, color: Colors.blue),
-                          onPressed: controller.sendMessage,
-                        ),
-                      ],
+                        hintText: "Send messages...",
+                        contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
+                  SizedBox(width: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      recodingNow
+                          ? Obx(()=>IconButton(
+                        icon: controller.isRecording.value
+                            ? const Icon(Icons.fiber_manual_record, color: Colors.red, size: 25)
+                            : const Icon(Icons.mic_none, color: Colors.red, size: 25),
+                        onPressed: controller.isRecording.value ? (){
+                          controller.stopRecording();
+                          setState(() {
+                            recodingNow = false;
+                          });
+                        } : controller.startRecording,
+                      ))
+                          : Obx(()=>Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            icon: controller.playing.value
+                                ? Icon(Icons.pause_circle, color: Colors.green, size: 25)
+                                : Icon(Icons.play_circle, color: Colors.green, size: 25),
+                            onPressed: controller.playing.value
+                                ? controller.pauseRecording
+                                : controller.playRecording,
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red, size: 25),
+                            onPressed: (){
+                              controller.deleteRecording();
+                              setState(() {
+                                recodingNow = true;
+                              });
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.send_outlined, color: Colors.green, size: 25),
+                            onPressed: ()async {
+                              setState(() {
+                                isSending = true;
+                              });
+                              await controller.sendMessage(true);
+                              setState(() {
+                                recodingNow = true;
+                                isSending = false;
+                              });
+                            },
+                          )
+                        ],
+                      )),
+                    ],
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.send, size: 25, color: Colors.blue),
+                    onPressed: () {
+                      controller.sendMessage(false);
+                    },
+                  ),
+                ],
+              ),
+            )
+          ],
         ),
       ),
     );
   }
+
 
   void showPicker(BuildContext context) {
     showModalBottomSheet(

@@ -56,9 +56,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         : const SizedBox.shrink();
                   }),
                   Button(
-                    showLoadingIndicator: loginController.apiCallStatus.value == ApiCallStatus.loading,
+                    showLoadingIndicator: loginController.
+                    isLoading.value,
                     text: "Log in",
-                    onPressed: () async {
+                    onPressed: loginController.
+                    isLoading.value == true ? null : () async {
                       loginController.errorMessage.value = '';
                       if (loginController.formKey.currentState?.validate() ??
                           false) {
@@ -101,24 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-          Obx(() {
-            if (loginController.apiCallStatus.value == ApiCallStatus.loading) {
-              return Container(
-                color: appTheme.primary.withOpacity(0.1),
-                child: Center(
-                  child: SizedBox(
-                    width: 50.w,
-                    height: 50.h,
-                    child: CircularProgressIndicator(
-                      color: appTheme.primary,
-                    ),
-                  ),
-                ),
-              );
-            } else {
-              return Container();
-            }
-          }),
+
         ],
       ),
     );

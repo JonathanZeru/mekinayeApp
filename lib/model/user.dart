@@ -64,13 +64,10 @@ class UserModel {
   }
   Map<String, dynamic> toUpdate(){
     return {
-      'id': id,
       'firstName': firstName,
       'lastName': lastName,
-      'email': email,
-      'status': status,
+      'type': "buyer",
       'userName': userName,
-      'phoneNumber': phoneNumber,
     };
   }
   Map<String, dynamic> toGoogleSignInUpdate(){

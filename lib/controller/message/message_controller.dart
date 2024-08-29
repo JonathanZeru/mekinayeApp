@@ -24,11 +24,14 @@ import 'dart:async';
 import '../../util/api_call_status.dart';
 import '../../widget/custom_snackbar.dart'; // Import for Timer
 import 'package:permission_handler/permission_handler.dart';
+import 'package:record/record.dart';
+import 'package:http/http.dart' as http;
 
+import '../../util/app_constants.dart';
 class MessageController extends GetxController {
   var messages = <Message>[].obs;
   final ImagePicker _picker = ImagePicker();
-  final audioPlayer = audioplayers.AudioPlayer();
+
   final isPlaying = <bool>[].obs;
   int currentPlayingIndex = -1;
   File? selectedImage;
@@ -43,22 +46,30 @@ class MessageController extends GetxController {
   var msgScrolling = ScrollController();
   late UserModel receiverData;
 
-  flutter_sound.FlutterSoundRecorder? _recorder;  // Voice recorder
-  RxBool isRecording = false.obs;
+  flutter_sound.FlutterSoundRecorder? _recorder;
+
   Timer? messagePollingTimer;
   final apiCallStatus = ApiCallStatus.holding.obs;
   final apiException = ApiException().obs;
 
-
   RxBool hasConnection = true.obs;
   RxBool checkingConnection = true.obs;
+
+  late Record audioRecord;
+  late AudioPlayer audioPlayer;
+  RxBool isRecording = false.obs;
+  // RxBool recodingNow = true.obs;
+  String audioPath = "";
+  RxBool playing = false.obs;
+  RxBool isSending = false.obs;
+
   @override
   void onInit() {
     super.onInit();
     userId.value = ConfigPreference.getUserProfile()['id'].toString();
+    audioPlayer = AudioPlayer();
+    audioRecord = Record();
     checkConnection();
-    _recorder = flutter_sound.FlutterSoundRecorder();
-    _recorder?.openRecorder();
     audioPlayer.onPlayerStateChanged.listen((audioplayers.PlayerState state) {
       if (state == audioplayers.PlayerState.completed) {
         if (currentPlayingIndex != -1) {
@@ -67,91 +78,176 @@ class MessageController extends GetxController {
         }
       }
     });
-
     startMessagePolling();
   }
+
   Future<void> checkConnection() async {
     checkingConnection.value = true;
     final bool isConnected = await InternetConnectionChecker().hasConnection;
-    if (isConnected) {
-      hasConnection.value = true;
-    } else {
-      hasConnection.value = false;
-    }
+    hasConnection.value = isConnected;
     checkingConnection.value = false;
   }
-  void startMessagePolling() {
+
+  void startMessagePolling() async {
+    bool isConnected = await InternetConnectionChecker().hasConnection;
     messagePollingTimer = Timer.periodic(Duration(seconds: 3), (timer) {
-      fetchMessages(receiverData);
+      if (isConnected) {
+        fetchMessages(receiverData);
+      } else {
+        Get.snackbar('Error', 'No Connection');
+        messagePollingTimer?.cancel();
+        hasConnection.value = false;
+      }
     });
   }
 
   void stopMessagePolling() {
     messagePollingTimer?.cancel();
   }
+
   @override
   void onClose() {
-    _recorder?.closeRecorder();
+    audioRecord.dispose();
+    audioPlayer.dispose();
     stopMessagePolling();
     super.onClose();
   }
 
-  // void startRecording() async {
-  //   if (_recorder!.isStopped) {
-  //     await _recorder?.startRecorder(toFile: 'voice_message.aac');
-  //     isRecording = true;
-  //     update();
-  //   }
-  // }
-
-  Future<void> requestMicrophonePermission() async {
-    var status = await Permission.microphone.status;
-    if (status.isDenied) {
-      // Request the permission
-      status = await Permission.microphone.request();
-    }
-
-    if (status.isGranted) {
-      // The permission is granted, you can start recording
-    } else {
-      // Permission is denied, handle accordingly
-      Get.snackbar('Permission Denied', 'Microphone permission is required to record audio.');
+  Future<void> startRecording() async {
+    try {
+      if (await audioRecord.hasPermission()) {
+        await audioRecord.start();
+        isRecording.value = true;
+      }
+    } catch (e, stackTrace) {
+      print("START RECORDING ERROR: $e");
     }
   }
 
-  void startRecording() async {
-    final status = await Permission.microphone.status;
-
-    if (!status.isGranted) {
-      // Inform the user that microphone access is needed
-      await requestMicrophonePermission();
-      Get.snackbar('Permission Required', 'Please grant microphone access to record audio.');
-      return;
-    }
-
+  Future<void> stopRecording() async {
     try {
-      await _recorder?.startRecorder(toFile: 'voice_message.aac');
-      isRecording.value = true;
+      String? path = await audioRecord.stop();
+      // recodingNow.value = false;
+      isRecording.value = false;
+      audioPath = path ?? "";
+    } catch (e) {
+      print("STOP RECORDING ERROR: $e");
+    }
+  }
+
+  Future<void> playRecording() async {
+    try {
+      playing.value = true;
+      Source urlSource = UrlSource(audioPath);
+      await audioPlayer.play(urlSource);
+      audioPlayer.onPlayerStateChanged.listen((PlayerState state) {
+        if (state == PlayerState.completed) {
+          playing.value = false;
+        }
+      });
+    } catch (e) {
+      print("PLAY RECORDING ERROR: $e");
+    }
+  }
+
+  Future<void> pauseRecording() async {
+    try {
+      playing.value = false;
+      await audioPlayer.pause();
+    } catch (e) {
+      print("PAUSE RECORDING ERROR: $e");
+    }
+  }
+
+  RxDouble uploadProgress = 0.0.obs;
+  Future<void> uploadAndDeleteRecording() async {
+    isSending.value = true;
+    final userProfile = ConfigPreference.getUserProfile();
+    try {
+      final url = Uri.parse('${AppConstants.url}/messages/send');
+      final file = File(audioPath);
+      if (!file.existsSync()) {
+        print("UPLOAD FILE NOT EXIST");
+        return;
+      }
+
+      final fileName = file.path.split('/').last;
+
+      final request = http.MultipartRequest('POST', url)
+        ..files.add(
+          http.MultipartFile(
+            'audio',
+            file.readAsBytes().asStream(),
+            file.lengthSync(),
+            filename: fileName,
+          ),
+        )
+        ..fields['senderId'] = userProfile['id'].toString()
+        ..fields['receiverId'] = receiverData.id.toString()
+        ..fields['senderUsername'] = userProfile['userName']
+        ..fields['receiverUsername'] = receiverData.userName!
+        ..fields['text'] = "null"
+        ..fields['image'] = "null";
+
+      final streamedResponse = await http.Client().send(request);
+
+      int totalBytes = file.lengthSync();
+      int bytesUploaded = 0;
+
+      streamedResponse.stream.transform(StreamTransformer.fromHandlers(
+        handleData: (data, sink) {
+          bytesUploaded += data.length;
+          double progress = bytesUploaded / totalBytes;
+          uploadProgress.value = progress;
+          sink.add(data);
+        },
+        handleError: (error, stackTrace, sink) {
+          print('UPLOAD ERROR: $error');
+          sink.addError(error, stackTrace);
+        },
+        handleDone: (sink) async {
+          sink.close();
+        },
+      )).listen((_) {});
+
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200) {
+
+      } else {
+        print('UPLOAD FAILED. STATUS CODE: ${response.statusCode}');
+      }
+      isSending.value = false;
+      uploadProgress.value = 1.0; // Set progress to 100% on success
+      audioPath = "";
+      playing.value = false;
+      // recodingNow.value = true; // Reset to initial recording state
+      deleteRecording();
       update();
     } catch (e) {
-      // Handle the exception
-      print("Error starting recorder: $e");
+      print('UPLOAD ERROR: $e');
     }
   }
 
-  void stopRecording() async {
-    if (_recorder!.isRecording) {
-      String? path = await _recorder?.stopRecorder();
-      isRecording.value = false;
-      selectedAudio = File(path!);
-      sendMessage();
-      update();
+  Future<void> deleteRecording() async {
+    if (audioPath.isNotEmpty) {
+      try {
+        File file = File(audioPath);
+        if (file.existsSync()) {
+          file.deleteSync();
+          print("FILE DELETED");
+        }
+      } catch (e) {
+        print("FILE DELETE ERROR: $e");
+      }
+      audioPath = "";
     }
   }
 
-  void setReceiverData(UserModel receiverDataModel){
+  void setReceiverData(UserModel receiverDataModel) {
     receiverData = receiverDataModel;
   }
+
   void fetchReceiverData(int ownerId) async {
     try {
       final response = await http.get(Uri.parse('${AppConstants.url}/users/$ownerId'));
@@ -163,154 +259,142 @@ class MessageController extends GetxController {
         UserModel owner = UserModel(id: ownerId);
         fetchMessages(owner);
       } else {
-        print("Failed to load user data");
+        print("FAILED TO LOAD USER DATA");
       }
     } catch (e) {
-      print("Error fetching user data: $e");
+      print("FETCH USER DATA ERROR: $e");
     }
   }
 
   void fetchMessages(UserModel owner) async {
     checkConnection();
     receiverData = owner;
-    final accessToken = ConfigPreference.getAccessToken();
     Map<String, dynamic> userProfile = ConfigPreference.getUserProfile();
 
     try {
       final response = await http.get(
         Uri.parse('${AppConstants.url}/messages/get-both-chats?senderId=${userProfile['id']}&receiverId=${receiverData.id}'),
-        headers: {
-          'Authorization': 'Bearer ${accessToken}',
-        },
       );
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         messages.value = data.map((item) => Message.fromJson(item)).toList().reversed.toList();
-        isPlaying.value = List<bool>.filled(messages.length, false);
       } else {
-        Get.snackbar('Error', 'Failed to fetch messages');
+        print("FAILED TO FETCH MESSAGES");
       }
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred: $e');
+      print("FETCH MESSAGES ERROR: $e");
     }
   }
+  Future<void> sendMessage(bool isAudio) async {
 
-  Future<void> sendMessage() async {
-
-    final accessToken = await AuthService.getAuthorizationToken();
+    // final accessToken = await AuthService.getAuthorizationToken();
     final userProfile = ConfigPreference.getUserProfile();
+    if(isAudio){
+      uploadAndDeleteRecording();
+    }else {
+      if (selectedImage == null && selectedAudio == null) {
+        await ApiService.safeApiCall(
+          "${AppConstants.url}/messages/send",
+          RequestType.post,
+          // headers: {
+          //   "Authorization": "Bearer $accessToken"
+          // },
+          data: jsonEncode({
+            "text": textController.text.isNotEmpty ? textController.text : "",
+            "image": null,
+            "audio": null,
+            "senderId": userProfile['id'],
+            "receiverId": receiverData.id,
+            "senderUsername": userProfile['userName'],
+            "receiverUsername": receiverData.userName
+          }),
+          onLoading: () {
+            update();
+          },
+          onSuccess: (response) async {
+            var responseData = response.data;
 
-    if(selectedImage == null && selectedAudio==null){
-      await ApiService.safeApiCall(
-        "${AppConstants.url}/messages/send",
-        RequestType.post,
-        headers: {
-          "Authorization": "Bearer $accessToken"
-        },
-        data: jsonEncode({
-          "text": textController.text.isNotEmpty ? textController.text : "",
-          "image": null,
-          "audio": null,
-          "senderId": userProfile['id'],
-          "receiverId": receiverData.id,
-          "senderUsername": userProfile['userName'],
-          "receiverUsername": receiverData.userName
-        }),
-        onLoading: () {
-          update();
-        },
-        onSuccess: (response) async {
-          var responseData = response.data;
-
-          apiCallStatus.value = ApiCallStatus.success;
-          textController.clear();
-          selectedImage = null;
-          selectedAudio = null;
-          fetchMessages(receiverData);
-          update();
-        },
-        onError: (error) {
-          ApiService.handleApiError(error);
-          apiException.value = error;
-          apiCallStatus.value = ApiCallStatus.error;
-          CustomSnackBar.showCustomErrorToast(
-            title: 'Error',
-            message: 'Failed to send message $error',
-            duration: Duration(seconds: 2),
-          );
-          fetchMessages(receiverData);
-          update();
-        },
-      );
-    }else{
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse('${AppConstants.url}/messages/send'),
-    );
-
-    request.headers['Authorization'] = 'Bearer $accessToken';
-
-    request.fields['senderId'] = userProfile['id'].toString();
-    request.fields['receiverId'] = receiverData.id.toString();
-    request.fields['senderUsername'] = userProfile['userName'];
-    request.fields['receiverUsername'] = receiverData.userName!;
-    request.fields['text'] = "null";
-
-    // Handle image attachment
-      // Handle image attachment
-      if (selectedImage != null) {
-        var imageStream = http.ByteStream(selectedImage!.openRead());
-        var imageLength = await selectedImage!.length();
-
-        var imageFile = http.MultipartFile(
-          'image',
-          imageStream,
-          imageLength,
-          filename: selectedImage!.path.split('/').last,
+            apiCallStatus.value = ApiCallStatus.success;
+            textController.text = "";
+            selectedImage = null;
+            selectedAudio = null;
+            fetchMessages(receiverData);
+            update();
+          },
+          onError: (error) {
+            ApiService.handleApiError(error);
+            apiException.value = error;
+            apiCallStatus.value = ApiCallStatus.error;
+            CustomSnackBar.showCustomErrorToast(
+              title: 'Error',
+              message: 'Failed to send message $error',
+              duration: Duration(seconds: 2),
+            );
+            textController.text = "";
+            selectedImage = null;
+            selectedAudio = null;
+            fetchMessages(receiverData);
+            update();
+          },
         );
-
-        request.files.add(imageFile);
-      } else {
-        request.fields['image'] = "null";
+        textController.text = "";
       }
-
-// Handle audio attachment
-      if (selectedAudio != null) {
-        var audioStream = http.ByteStream(selectedAudio!.openRead());
-        var audioLength = await selectedAudio!.length();
-
-        var audioFile = http.MultipartFile(
-          'audio',
-          audioStream,
-          audioLength,
-          filename: selectedAudio!.path.split('/').last,
+      else {
+        var request = http.MultipartRequest(
+          'POST',
+          Uri.parse('${AppConstants.url}/messages/send'),
         );
 
-        request.files.add(audioFile);
-      } else {
+        // request.headers['Authorization'] = 'Bearer $accessToken';
+
+        request.fields['senderId'] = userProfile['id'].toString();
+        request.fields['receiverId'] = receiverData.id.toString();
+        request.fields['senderUsername'] = userProfile['userName'];
+        request.fields['receiverUsername'] = receiverData.userName!;
+        request.fields['text'] = "null";
         request.fields['audio'] = "null";
+        // Handle image attachment
+        // Handle image attachment
+        if (selectedImage != null) {
+          var imageStream = http.ByteStream(selectedImage!.openRead());
+          var imageLength = await selectedImage!.length();
+
+          var imageFile = http.MultipartFile(
+            'image',
+            imageStream,
+            imageLength,
+            filename: selectedImage!
+                .path
+                .split('/')
+                .last,
+          );
+
+          request.files.add(imageFile);
+        } else {
+          request.fields['image'] = "null";
+        }
+
+
+        try {
+          var response = await request.send();
+          var responseString = await response.stream.bytesToString();
+
+          if (response.statusCode == 201) {
+            textController.text = "";
+            selectedImage = null;
+            selectedAudio = null;
+            fetchMessages(receiverData);
+          } else {
+
+          }
+
+          // return http.Response(responseString, response.statusCode);
+
+        } catch (e) {
+          Get.snackbar('Error', 'An error occurred: $e');
+          // return http.Response("Error", 500);
+        }
       }
-
-
-    try {
-      var response = await request.send();
-      var responseString = await response.stream.bytesToString();
-
-      if (response.statusCode == 201) {
-        textController.clear();
-        selectedImage = null;
-        selectedAudio = null;
-        fetchMessages(receiverData);
-      } else {
-
-      }
-
-      // return http.Response(responseString, response.statusCode);
-
-    } catch (e) {
-      Get.snackbar('Error', 'An error occurred: $e');
-      // return http.Response("Error", 500);
-    }
     }
   }
 
@@ -318,7 +402,7 @@ class MessageController extends GetxController {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       selectedImage = File(pickedFile.path);
-      sendMessage();
+      sendMessage(false);
     }
   }
 
@@ -326,7 +410,7 @@ class MessageController extends GetxController {
     final pickedFile = await _picker.pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       selectedImage = File(pickedFile.path);
-      sendMessage();
+      sendMessage(false);
     }
   }
 
@@ -350,3 +434,4 @@ class MessageController extends GetxController {
     }
   }
 }
+

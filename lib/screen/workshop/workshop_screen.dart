@@ -57,8 +57,8 @@ class WorkshopScreen extends GetView<CarBrandsController> {
                     Get.to(() => SingleSparePartScreen(
                       carBrandId: carBrand.id,
                       ownerId: carBrand.ownerId,
-                        spareParts: carBrand!.spareParts!,
-                      owner: carBrand.owner,
+                        spareParts: carBrand.spareParts!,
+                      owner: carBrand.owner
                     ));
                   },
                   child: Padding(

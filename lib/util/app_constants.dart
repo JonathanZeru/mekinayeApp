@@ -7,6 +7,134 @@ class AppConstants {
   static const String url = "http://134.209.218.229/api";
   static const String imageUrl = "http://134.209.218.229";
   static const String wsUrl = "";
+  static List<Map<String, dynamic>> termsAndConditions = [
+    {
+      "title": "Acceptance of Terms",
+      "description": "By using this app, you agree to be bound by these terms and conditions. If you do not agree, please do not use the app."
+    },
+    {
+      "title": "User Accounts",
+      "description": "To access certain features, you may be required to create an account. You are responsible for maintaining the confidentiality of your account information and for all activities that occur under your account."
+    },
+    {
+      "title": "Prohibited Conduct",
+      "description": "You agree not to engage in any activity that could harm the app or other users, including hacking, transmitting viruses, or using the app for illegal purposes."
+    },
+    {
+      "title": "Intellectual Property",
+      "description": "All content, trademarks, and data on the app, including but not limited to text, images, logos, and software, are the property of the app or its licensors and are protected by intellectual property laws."
+    },
+    {
+      "title": "User-Generated Content",
+      "description": "By submitting content to the app, you grant us a non-exclusive, royalty-free license to use, modify, and distribute your content in connection with the app's operation."
+    },
+    {
+      "title": "Termination of Use",
+      "description": "We reserve the right to suspend or terminate your access to the app at any time, without notice, if you violate these terms or engage in conduct that we deem harmful to the app or other users."
+    },
+    {
+      "title": "Limitation of Liability",
+      "description": "To the fullest extent permitted by law, we are not liable for any damages arising from your use of the app or for any interruption, suspension, or termination of the app."
+    },
+    {
+      "title": "Governing Law",
+      "description": "These terms and conditions are governed by and construed in accordance with the laws of [Your Country/State]. Any disputes arising from these terms will be subject to the exclusive jurisdiction of the courts in [Your Country/State]."
+    },
+    {
+      "title": "Changes to Terms",
+      "description": "We may update these terms and conditions from time to time. Continued use of the app following any changes constitutes your acceptance of the new terms."
+    },
+    {
+      "title": "Contact Information",
+      "description": "If you have any questions about these terms and conditions, please contact us at [your contact information]. We are here to assist you with any inquiries."
+    }
+  ];
+
+  static List<Map<String, dynamic>> privacyPolicy = [
+    {
+      "title": "Collection of Personal Information",
+      "description": "We collect personal information that you voluntarily provide to us when registering on the app, such as your name, email address, and contact details."
+    },
+    {
+      "title": "Use of Collected Information",
+      "description": "The information we collect is used to enhance your experience on the app, such as personalizing content, providing customer support, and improving our services."
+    },
+    {
+      "title": "Sharing of Information",
+      "description": "We do not share your personal information with third parties without your consent, except to comply with legal obligations or to protect our rights."
+    },
+    {
+      "title": "Data Security",
+      "description": "We implement security measures to protect your data, including encryption and secure storage, to prevent unauthorized access, disclosure, or alteration."
+    },
+    {
+      "title": "Cookies and Tracking Technologies",
+      "description": "Our app uses cookies and similar tracking technologies to improve functionality and analyze usage patterns. You can control cookie preferences through your device settings."
+    },
+    {
+      "title": "User Rights",
+      "description": "You have the right to access, correct, or delete your personal information at any time. You can also withdraw your consent for data processing or object to certain processing activities."
+    },
+    {
+      "title": "Data Retention",
+      "description": "We retain your personal information only for as long as necessary to fulfill the purposes outlined in this policy, or as required by law."
+    },
+    {
+      "title": "Children's Privacy",
+      "description": "Our app is not intended for children under the age of 13. We do not knowingly collect personal information from children without parental consent."
+    },
+    {
+      "title": "Changes to Privacy Policy",
+      "description": "We may update this privacy policy from time to time. We will notify you of any significant changes by posting the new policy on the app and updating the effective date."
+    },
+    {
+      "title": "Contact Information",
+      "description": "If you have any questions or concerns about this privacy policy, please contact us at [your contact information]. We are here to assist you with any inquiries."
+    }
+  ];
+
+  static List<Map<String, dynamic>> faqs = [
+    {
+      "title": "How do I search for a car model in the app?",
+      "description": "Use the search bar at the top of the home screen to enter the car model or brand you're looking for. You can also filter results by various criteria like price, year, and mileage."
+    },
+    {
+      "title": "How can I compare different car models?",
+      "description": "The app allows you to select multiple car models and compare their features side by side. Just select the models you want to compare and click on the 'Compare' button."
+    },
+    {
+      "title": "How do I save a car to my favorites?",
+      "description": "To save a car to your favorites, tap the heart icon on the car listing. You can view your saved cars under the 'Favorites' section in your profile."
+    },
+    {
+      "title": "How can I contact the seller?",
+      "description": "You can contact the seller directly through the app by clicking on the 'Contact Seller' button on the car listing. You can choose to call, message, or email the seller."
+    },
+    {
+      "title": "What financing options are available?",
+      "description": "The app provides various financing options through partnered financial institutions. You can view these options by selecting the 'Finance' tab on the car listing page."
+    },
+    {
+      "title": "How do I schedule a test drive?",
+      "description": "To schedule a test drive, click on the 'Schedule Test Drive' button on the car listing. You'll be prompted to choose a date and time that works for you."
+    },
+    {
+      "title": "Can I trade in my old car?",
+      "description": "Yes, the app allows you to trade in your old car. Go to the 'Trade-In' section, enter your car's details, and get an estimated trade-in value that can be applied to your next purchase."
+    },
+    {
+      "title": "How do I get alerts for new listings?",
+      "description": "You can set up alerts for new listings by going to the 'Notifications' section in your profile. Set your preferences for the types of cars you're interested in, and you'll receive alerts when new listings match your criteria."
+    },
+    {
+      "title": "What should I do if I encounter a technical issue?",
+      "description": "If you experience any technical issues with the app, you can reach out to our support team through the 'Help & Support' section. Provide details about the issue, and our team will assist you promptly."
+    },
+    {
+      "title": "How do I sell my car through the app?",
+      "description": "To sell your car, go to the 'Sell Your Car' section, fill in the necessary details, upload photos, and set your price. Your listing will be live once it's reviewed and approved by our team."
+    }
+  ];
 
   static List<Map<String, dynamic>> homeScreenGrid = [
     {"id": 0, "name": "Ethio Spare",

@@ -51,9 +51,9 @@ class ProfileScreen extends StatelessWidget {
             children: [
               UserProfileHeader(
                 firstName:
-                editProfileController.fullNameController.text.split(" ")[0],
+                editProfileController.firstNameController.text,
                 lastName:
-                editProfileController.fullNameController.text.split(" ")[1][0],
+                editProfileController.lastNameController.text,
                 email: editProfileController.emailController.text,
               ),
               const SizedBox(height: 20),
