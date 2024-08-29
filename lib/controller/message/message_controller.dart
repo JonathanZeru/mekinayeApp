@@ -10,8 +10,7 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:logger/logger.dart';
 import 'package:mekinaye/util/app_constants.dart';
 import 'package:audioplayers/audioplayers.dart' as audioplayers;
-import 'package:flutter_sound/flutter_sound.dart'
-    as flutter_sound; // Add this for voice recording
+import 'package:flutter_sound/flutter_sound.dart' as flutter_sound; // Add this for voice recording
 
 import '../../config/config_preference.dart';
 import '../../model/api_exceptions.dart';
@@ -81,6 +80,7 @@ class MessageController extends GetxController {
     });
     startMessagePolling();
   }
+
   Future<void> checkConnection() async {
     checkingConnection.value = true;
     final bool isConnected = await InternetConnectionChecker().hasConnection;
@@ -104,6 +104,7 @@ class MessageController extends GetxController {
   void stopMessagePolling() {
     messagePollingTimer?.cancel();
   }
+
   @override
   void onClose() {
     audioRecord.dispose();
@@ -249,8 +250,7 @@ class MessageController extends GetxController {
 
   void fetchReceiverData(int ownerId) async {
     try {
-      final response =
-          await http.get(Uri.parse('${AppConstants.url}/users/$ownerId'));
+      final response = await http.get(Uri.parse('${AppConstants.url}/users/$ownerId'));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         receiverName.value = "${data['firstName']} ${data['lastName']}";
@@ -269,38 +269,24 @@ class MessageController extends GetxController {
   void fetchMessages(UserModel owner) async {
     checkConnection();
     receiverData = owner;
-    // final accessToken s= ConfigPreference.getAccessToken();
     Map<String, dynamic> userProfile = ConfigPreference.getUserProfile();
 
     try {
       final response = await http.get(
         Uri.parse('${AppConstants.url}/messages/get-both-chats?senderId=${userProfile['id']}&receiverId=${receiverData.id}'),
-        Uri.parse(
-            '${AppConstants.url}/messages/get-both-chats?senderId=${userProfile['id']}&receiverId=${receiverData.id}'),
-        // headers: {
-        //   'Authorization': 'Bearer ${accessToken}',
-        // },
       );
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         messages.value = data.map((item) => Message.fromJson(item)).toList().reversed.toList();
       } else {
         print("FAILED TO FETCH MESSAGES");
-        messages.value = data
-            .map((item) => Message.fromJson(item))
-            .toList()
-            .reversed
-            .toList();
-        isPlaying.value = List<bool>.filled(messages.length, false);
       }
     } catch (e) {
       print("FETCH MESSAGES ERROR: $e");
     }
-    } catch (e) {}
   }
   Future<void> sendMessage(bool isAudio) async {
 
-    // final accessToken = await AuthService.getAuthorizationToken();
     // final accessToken = await AuthService.getAuthorizationToken();
     final userProfile = ConfigPreference.getUserProfile();
     if(isAudio){
