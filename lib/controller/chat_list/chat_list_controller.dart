@@ -20,11 +20,10 @@ class ChatListController extends GetxController {
   Future<void> onInit() async {
     super.onInit();
     isLoading.value = true;
-    isLoggedIn.value =
-        await AuthService.isUserLoggedIn();
+    isLoggedIn.value = await AuthService.isUserLoggedIn();
     bool isConnected = await InternetConnectionChecker().hasConnection;
-    if(isConnected){
-      if(isLoggedIn.value) {
+    if (isConnected) {
+      if (isLoggedIn.value) {
         fetchUsersAndLastMessages();
       }else{
         isLoading.value = false;
