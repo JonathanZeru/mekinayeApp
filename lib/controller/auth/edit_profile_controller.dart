@@ -9,17 +9,23 @@ import 'package:mekinaye/widget/custom_snackbar.dart';
 import '../../config/config_preference.dart';
 import '../../model/api_exceptions.dart';
 import '../../model/user.dart';
+import '../../service/authorization_service.dart';
 import '../../util/app_constants.dart';
 import '../../util/app_routes.dart';
 
 class EditProfileController extends GetxController {
   // Form editing controller
   final editProfileFormKey = GlobalKey<FormState>();
+  // Form editing controller
+  final changePasswordFormKey = GlobalKey<FormState>();
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
   final userNameController = TextEditingController();
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
+  final oldPasswordController = TextEditingController();
+  final newPasswordController = TextEditingController();
+
   final birthDateFocusNode = FocusNode().obs;
   late RxInt id = 0.obs;
 
@@ -52,8 +58,7 @@ class EditProfileController extends GetxController {
       firstName: firstNameController.text,
       lastName: lastNameController.text,
       userName: userNameController.text,
-      // status: 1,
-      // Additional fields as needed
+      phoneNumber: phoneController.text
     );
 
     Map<String, dynamic> userMap = user.toUpdate();
@@ -144,4 +149,68 @@ class EditProfileController extends GetxController {
       update();
     }
   }
+  changePassword() async {
+    if (!changePasswordFormKey.currentState!.validate()) {
+      return;
+    }
+
+    var jsonBody = jsonEncode({
+      "oldPassword": oldPasswordController.text,
+      "newPassword": newPasswordController.text
+    });
+
+    // final accessToken = ConfigPreference.getAccessToken();
+    Map<String, dynamic> header = {
+      'Content-Type': 'application/json',
+      // "Authorization": "Bearer $accessToken"
+    };
+
+    await ApiService.safeApiCall(
+      "${AppConstants.url}/users/change-password?id=${id.value}",
+      // headers: header,
+      RequestType.patch,
+      data: jsonBody,
+      onLoading: () {
+        apiCallStatus.value = ApiCallStatus.loading;
+        update();
+      },
+      onSuccess: (response) async {
+        var responseData = response.data;
+        apiCallStatus.value = ApiCallStatus.success;
+        Logger().i(response.data);
+
+        CustomSnackBar.showCustomToast(
+          title: "Success",
+          message: responseData['message'] ?? "Password changed successfully!",
+        );
+
+        final userProfile = ConfigPreference.getUserProfile();
+        Map<String, dynamic> body = {
+          "userId": userProfile['id'],
+          "fcmToken": ""
+        };
+
+        await ApiService.safeApiCall(
+          "${AppConstants.url}/users/update-token",
+          RequestType.post,
+          data: body,
+          onLoading: () {},
+          onSuccess: (response) {},
+          onError: (error) {},
+        );
+        AuthService.logout();
+        Get.offAllNamed(AppRoutes.login);
+
+        update();
+      },
+      onError: (error) {
+        e.value = error;
+        apiCallStatus.value = ApiCallStatus.error;
+        errorMessage.value = 'Unable to update';
+        print(e.value);
+        update();
+      },
+    );
+  }
+
 }

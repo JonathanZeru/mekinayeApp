@@ -26,7 +26,11 @@ class ChatListController extends GetxController {
     if(isConnected){
       if(isLoggedIn.value) {
         fetchUsersAndLastMessages();
+      }else{
+        isLoading.value = false;
       }
+    }else{
+      isLoading.value = false;
     }
   }
 

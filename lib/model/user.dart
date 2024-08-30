@@ -67,6 +67,7 @@ class UserModel {
       'lastName': lastName,
       'type': "buyer",
       'userName': userName,
+      'phoneNumber': phoneNumber
     };
   }
 

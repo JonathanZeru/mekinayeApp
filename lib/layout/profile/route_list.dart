@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:mekinaye/layout/profile/general_layout.dart';
+import 'package:mekinaye/layout/profile/profile_layout.dart';
 import 'package:mekinaye/widget/profile/profile_section_container.dart';
 
 class RouteList extends StatelessWidget {
@@ -22,6 +23,7 @@ class RouteList extends StatelessWidget {
       physics: const BouncingScrollPhysics(),
       shrinkWrap: true,
       children: [
+        buildSection(const ProfileLayout()),
         buildSection(const GeneralLayout()),
         // buildSection(const OtherLayout()),
       ],

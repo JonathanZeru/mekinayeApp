@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../controller/ads/ads_controller.dart';
+import '../../controller/connection/internet_connection_controller.dart';
 import '../../widget/loading.dart';
+import '../error/error_screen.dart';
 
 class AdsCarousel extends StatefulWidget {
   const AdsCarousel({super.key});
@@ -29,11 +31,16 @@ class _AdsCarouselState extends State<AdsCarousel> {
     final AdsController adsController = Get.put(AdsController());
     final ThemeData theme = Theme.of(context);
 
+    final internetController = Get.put(InternetController());
     return RefreshIndicator(
       onRefresh: () async {
         adsController.fetchAds();
       },
       child: Obx(() {
+        if (internetController.hasConnection.value == false &&
+            internetController.checkingConnection.value == false) {
+          return ErrorScreen(onPress: internetController.checkingConnection);
+        }
         if (adsController.isLoading.value) {
           return Center(
             child: SizedBox(

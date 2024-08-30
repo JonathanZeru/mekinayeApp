@@ -23,6 +23,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     final LoginPageController loginController = Get.put(LoginPageController());
@@ -42,42 +44,50 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const LoginForm(),
                   SizedBox(height: 5.h),
-                  Obx(() {
-                    final errorMessage = loginController.errorMessage.value;
-                    return errorMessage.isNotEmpty
-                        ? Padding(
-                            padding: EdgeInsets.only(bottom: 10.h),
-                            child: Text(errorMessage,
-                                style: appTheme.typography.bodyMedium.copyWith(
-                                    color: appTheme.error,
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.bold)),
-                          )
-                        : const SizedBox.shrink();
-                  }),
-                  Button(
-                    showLoadingIndicator: loginController.
-                    isLoading.value,
-                    text: "Log in",
-                    onPressed: loginController.
-                    isLoading.value == true ? null : () async {
-                      loginController.errorMessage.value = '';
-                      if (loginController.formKey.currentState?.validate() ??
-                          false) {
-                        loginController.formKey.currentState?.save();
-                        await loginController.loginUser();
-                      }
-                    },
-                    options: ButtonOptions(
-                      width: double.infinity,
-                      height: 45.h,
-                      padding: EdgeInsets.all(10.h),
-                      textStyle: appTheme.typography.titleMedium
-                          .copyWith(color: appTheme.primaryBtnText),
+                  Container(
+                    child: isLoading ? CircularProgressIndicator():
+                    Button(
+                      showLoadingIndicator: isLoading,
+                      text: "Log in",
+                      onPressed: isLoading == true ? null : () async {
+                        loginController.errorMessage.value = '';
+                        if (loginController.formKey.currentState?.validate() ??
+                            false) {
+                          setState(() {
+                            isLoading = true;
+                          });
+                          loginController.formKey.currentState?.save();
+                          await loginController.loginUser();
+                          if(loginController.apiCallStatus.value == ApiCallStatus.success){
+                            CustomSnackBar.showCustomSnackBar(
+                              title: 'Success',
+                              message: 'Login Successful',
+                              duration: Duration(seconds: 2),
+                            );
+                          }else if(loginController.isError.value){
+                            CustomSnackBar.showCustomErrorToast(
+                              title: 'Error',
+                              message: loginController.errorMessage.value ??
+                                  'Login Error',
+                              duration: Duration(seconds: 2),
+                            );
+                          }
+                          setState(() {
+                            isLoading = false;
+                          });
+                        }
+                      },
+                      options: ButtonOptions(
+                        width: double.infinity,
+                        height: 45.h,
+                        padding: EdgeInsets.all(10.h),
+                        textStyle: appTheme.typography.titleMedium
+                            .copyWith(color: appTheme.primaryBtnText),
+                      ),
                     ),
                   ),
                   SizedBox(height: 15.h),
-                  const LoginOptions(),
+                  // const LoginOptions(),
                   GoogleAuth(),
                   SizedBox(height: 20.h),
                   const RouterText(

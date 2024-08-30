@@ -18,6 +18,7 @@ class EditProfileForm extends GetView<EditProfileController> {
       child: Column(
         children: [
           CustomInputField(
+            label: 'First name',
             textEditingController: controller.firstNameController,
             hint: "First name",
             obscureText: false,
@@ -30,9 +31,10 @@ class EditProfileForm extends GetView<EditProfileController> {
             },
           ),
           SizedBox(
-            height: 5.0.h,
+            height: 5.0.h
           ),
           CustomInputField(
+            label: 'Last name',
             textEditingController: controller.lastNameController,
             hint: "Last name",
             obscureText: false,
@@ -44,26 +46,28 @@ class EditProfileForm extends GetView<EditProfileController> {
               return Validator.validateWord(value);
             },
           ),
-          // SizedBox(
-          //   height: 5.0.h,
-          // ),
-          // CustomInputField(
-          //   textEditingController: controller.emailController,
-          //   hint: "Email",
-          //   obscureText: false,
-          //   type: TextInputType.emailAddress,
-          //   textStyle: theme.typography.bodySmall,
-          //   labelTextStyle: theme.typography.labelMedium,
-          //   isDense: true,
-          //   validator: (value) {
-          //     return Validator.validateEmail(value);
-          //   },
-          //   enabled: false,
-          // ),
           SizedBox(
             height: 5.0.h,
           ),
           CustomInputField(
+            label: 'Phone',
+            textEditingController: controller.phoneController,
+            hint: "Phone",
+            obscureText: false,
+            type: TextInputType.emailAddress,
+            textStyle: theme.typography.bodySmall,
+            labelTextStyle: theme.typography.labelMedium,
+            isDense: true,
+            validator: (value) {
+              return Validator.validatePhone(value);
+            },
+            enabled: false,
+          ),
+          SizedBox(
+            height: 5.0.h,
+          ),
+          CustomInputField(
+            label: 'User name',
             textEditingController: controller.userNameController,
             hint: "User name",
             obscureText: false,

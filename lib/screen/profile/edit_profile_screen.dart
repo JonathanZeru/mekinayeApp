@@ -15,6 +15,15 @@ class EditProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     Get.find<EditProfileController>();
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Update profile"),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: (){
+            Get.back();
+          }
+        ),
+      ),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 36.w, vertical: 50.h),
@@ -22,7 +31,7 @@ class EditProfileScreen extends StatelessWidget {
             children: [
               const EditProfileForm(),
               SizedBox(
-                height: 30.h,
+                height: 30.h
               ),
               const EditProfileActions()
             ],

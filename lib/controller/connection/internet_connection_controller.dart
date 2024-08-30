@@ -9,8 +9,9 @@ class InternetController extends GetxController {
   RxBool checkingConnection = true.obs;
 
   @override
-  void onInit() {
-    checkConnection();
+  void onInit()async {
+    await checkConnection();
+    checkingConnection.value = false;
   }
   Future<void> checkConnection() async {
     checkingConnection.value = true;
@@ -18,9 +19,10 @@ class InternetController extends GetxController {
     if (isConnected) {
       print("get connection");
       hasConnection.value = true;
+      checkingConnection.value = false;
     } else {
       hasConnection.value = false;
+      checkingConnection.value = false;
     }
-    checkingConnection.value = false;
   }
 }
