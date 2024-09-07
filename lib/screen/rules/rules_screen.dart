@@ -25,14 +25,15 @@ class _RulesScreenState extends State<RulesScreen> {
   Future<void> _refreshData() async {
     await rulesController.fetchRules();
   }
+
   bool hasConnection = true;
   bool checkingConnection = true;
-
 
   @override
   void initState() {
     checkConnection();
   }
+
   Future<void> checkConnection() async {
     setState(() {
       checkingConnection = true;
@@ -51,15 +52,14 @@ class _RulesScreenState extends State<RulesScreen> {
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final AppTheme theme = AppTheme.of(context);
-    if(checkingConnection == true){
+    if (checkingConnection == true) {
       return SafeArea(
         child: Scaffold(
-          body: Center(
-              child: Loading()
-          ),
+          body: Center(child: Loading()),
         ),
       );
     }
@@ -69,7 +69,7 @@ class _RulesScreenState extends State<RulesScreen> {
     return SafeArea(
       child: Obx(() {
         if (rulesController.isLoading.value) {
-          return Center(child: CircularProgressIndicator());
+          return Center(child: Loading());
         }
 
         // Group rules by cityName
@@ -92,14 +92,14 @@ class _RulesScreenState extends State<RulesScreen> {
             child: Scaffold(
               appBar: widget.isFromHome
                   ? AppBar(
-                title: Text("Rules"),
-                leading: IconButton(
-                  icon: Icon(Icons.arrow_back_ios),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              )
+                      title: Text("Rules"),
+                      leading: IconButton(
+                        icon: Icon(Icons.arrow_back_ios),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    )
                   : AppBar(title: Text("Rules")),
               body: Column(
                 children: [
@@ -109,23 +109,24 @@ class _RulesScreenState extends State<RulesScreen> {
                     indicator: BoxDecoration(
                       color: theme.primary,
                     ),
-                    unselectedLabelStyle:
-                    theme.typography.titleSmall.copyWith(color: theme.primary),
-                    labelStyle:
-                    theme.typography.titleSmall.copyWith(color: Colors.white),
+                    unselectedLabelStyle: theme.typography.titleSmall
+                        .copyWith(color: theme.primary),
+                    labelStyle: theme.typography.titleSmall
+                        .copyWith(color: Colors.white),
                     labelColor: Colors.white,
                     unselectedLabelColor: theme.primary,
                     tabs: cities
                         .map(
                           (city) => Tab(
-                        child: Container(
-                          height: 30,
-                          child: Center(
-                            child: Text(city, style: theme.typography.titleSmall),
+                            child: Container(
+                              height: 30,
+                              child: Center(
+                                child: Text(city,
+                                    style: theme.typography.titleSmall),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    )
+                        )
                         .toList(),
                   ),
                   Expanded(
@@ -146,9 +147,12 @@ class _RulesScreenState extends State<RulesScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Sub City: ${rules[index].subCityName}'),
-                                    Text('Country: ${rules[index].countryName}'),
-                                    Text('Description: ${rules[index].description}'),
+                                    Text(
+                                      '${rules[index].name}',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text('${rules[index].description}'),
                                   ],
                                 ),
                               );

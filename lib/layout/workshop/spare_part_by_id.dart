@@ -21,11 +21,13 @@ class SingleSparePartScreen extends StatelessWidget {
   final int ownerId;
   final List<SparePart> spareParts;
   final UserModel owner;
+  final String brandName;
 
   SingleSparePartScreen(
       {required this.carBrandId,
       required this.ownerId,
       required this.spareParts,
+      required this.brandName,
       required this.owner});
 
   @override
@@ -38,7 +40,7 @@ class SingleSparePartScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Ethio Spare Part",
+          brandName,
           style: theme.typography.titleLarge.copyWith(
             color: theme.primaryText,
             fontSize: 20.0,
@@ -66,6 +68,9 @@ class SingleSparePartScreen extends StatelessWidget {
                     bool isLoggedIn = await AuthService.isUserLoggedIn();
                     if (isLoggedIn) {
                       Get.to(() => MessagingScreen(
+                          sparePartId: sparePart.id,
+                          brandName: brandName,
+                          sparePartName: sparePart.name,
                           ownerId: ownerId,
                           owner: owner,
                           args: {'isFromNotification': false}));
@@ -118,7 +123,7 @@ class SingleSparePartScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 8.h),
                           Text(
-                            'Price: \$${sparePart.price.toStringAsFixed(2)}',
+                            'Price: ${sparePart.price.toStringAsFixed(2)} ETB',
                             style: theme.typography.titleMedium.copyWith(
                                 color: theme.primaryText,
                                 fontSize: 16.0,
@@ -143,9 +148,13 @@ class SingleSparePartScreen extends StatelessWidget {
               bool isLoggedIn = await AuthService.isUserLoggedIn();
               if (isLoggedIn) {
                 Get.to(() => MessagingScreen(
-                    ownerId: ownerId,
-                    owner: owner,
-                    args: {'isFromNotification': false}));
+                      sparePartId: 0,
+                      brandName: brandName,
+                      ownerId: ownerId,
+                      owner: owner,
+                      args: {'isFromNotification': false},
+                      sparePartName: '',
+                    ));
               } else {
                 CustomSnackBar.showCustomSnackBar(
                   title: 'Login',
@@ -161,9 +170,13 @@ class SingleSparePartScreen extends StatelessWidget {
                   elevation: MaterialStatePropertyAll(0)),
               onPressed: () {
                 Get.to(() => MessagingScreen(
-                    ownerId: ownerId,
-                    owner: owner,
-                    args: {'isFromNotification': false}));
+                      sparePartId: 0,
+                      brandName: brandName,
+                      ownerId: ownerId,
+                      owner: owner,
+                      args: {'isFromNotification': false},
+                      sparePartName: '',
+                    ));
               },
               icon: const Icon(CupertinoIcons.chat_bubble_fill,
                   color: Colors.white),

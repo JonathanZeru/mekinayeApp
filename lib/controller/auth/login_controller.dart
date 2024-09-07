@@ -39,7 +39,6 @@ class LoginPageController extends GetxController {
       RequestType.post,
       data: jsonBody,
       onLoading: () {
-        isLoading.value = true;
         apiCallStatus.value = ApiCallStatus.loading;
         update();
       },

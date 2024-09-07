@@ -2,93 +2,63 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-  <key>NSLocationWhenInUseUsageDescription</key>
-  <string>We need your location to show nearby gas stations.</string>
-  <key>NSLocationAlwaysUsageDescription</key>
-  <string>We need your location to show nearby gas stations.</string>
+    <key>CADisableMinimumFrameDurationOnPhone</key>
+    <true/>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>$(DEVELOPMENT_LANGUAGE)</string>
+    <key>CFBundleDisplayName</key>
+    <string>Mekinaye</string>
+    <key>CFBundleExecutable</key>
+    <string>$(EXECUTABLE_NAME)</string>
+    <key>CFBundleIdentifier</key>
+    <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 
-  <key>NSMicrophoneUsageDescription</key>
-  <string>Some message to describe why you need this permission</string>
-  <!-- General Application Info -->
-  <key>CFBundleDevelopmentRegion</key>
-  <string>$(DEVELOPMENT_LANGUAGE)</string>
-  <key>CFBundleDisplayName</key>
-  <string>Mekinaye</string>
-  <key>CFBundleExecutable</key>
-  <string>$(EXECUTABLE_NAME)</string>
-  <key>CFBundleIdentifier</key>
-  <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-  <key>CFBundleInfoDictionaryVersion</key>
-  <string>6.0</string>
-  <key>CFBundleName</key>
-  <string>Mekinaye</string>
-  <key>CFBundlePackageType</key>
-  <string>APPL</string>
-  <key>CFBundleShortVersionString</key>
-  <string>$(FLUTTER_BUILD_NAME)</string>
-  <key>CFBundleVersion</key>
-  <string>$(FLUTTER_BUILD_NUMBER)</string>
-  <key>LSRequiresIPhoneOS</key>
-  <true/>
-  <key>UILaunchStoryboardName</key>
-  <string>LaunchScreen</string>
-  <key>UIMainStoryboardFile</key>
-  <string>Main</string>
-  <key>UISupportedInterfaceOrientations</key>
-  <array>
-    <string>UIInterfaceOrientationPortrait</string>
-    <string>UIInterfaceOrientationLandscapeLeft</string>
-    <string>UIInterfaceOrientationLandscapeRight</string>
-  </array>
-  <key>UISupportedInterfaceOrientations~ipad</key>
-  <array>
-    <string>UIInterfaceOrientationPortrait</string>
-    <string>UIInterfaceOrientationPortraitUpsideDown</string>
-    <string>UIInterfaceOrientationLandscapeLeft</string>
-    <string>UIInterfaceOrientationLandscapeRight</string>
-  </array>
-  <key>CADisableMinimumFrameDurationOnPhone</key>
-  <true/>
-  <key>UIApplicationSupportsIndirectInputEvents</key>
-  <true/>
-  
-  <!-- Privacy Settings -->
-  <key>NSMicrophoneUsageDescription</key>
-  <string>We need your microphone access to record audio messages</string>
-  <key>NSPhotoLibraryUsageDescription</key>
-  <string>We need access to your photo library to allow you to select images.</string>
-  <key>NSCameraUsageDescription</key>
-  <string>We need access to your camera to allow you to take pictures.</string>
 
-  <!-- Push Notifications -->
-  <key>UIBackgroundModes</key>
-  <array>
-    <string>fetch</string>
-    <string>remote-notification</string>
-  </array>
-
-  <!-- URL Types for Google Sign-In -->
-  <key>CFBundleURLTypes</key>
-  <array>
-    <dict>
-      <key>CFBundleURLSchemes</key>
-      <array>
-        <string>com.googleusercontent.apps.964110836736-m4c77m2bnhmc1qdvep8gavjekr6ajh4p</string>
-        <!-- Add any other required URL schemes here -->
-      </array>
-    </dict>
-    <dict>
-      <key>CFBundleURLSchemes</key>
-      <array>
-        <string>tel</string>
-      </array>
-    </dict>
-  </array>
-
-  <!-- Firebase Configuration -->
-  <key>GoogleAppID</key>
-  <string>1:964110836736:ios:125367e41095e72a7064e5</string>
-  <key>GCM_SenderID</key>
-  <string>964110836736</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>Mekinaye</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.1.0</string> <!-- Replace with your version number -->  
+    <key>CFBundleVersion</key>
+    <string>8</string> <!-- Replace with your build number -->
+    <key>GCM_SenderID</key>
+    <string>964110836736</string>
+    <key>GoogleAppID</key>
+    <string>1:964110836736:ios:125367e41095e72a7064e5</string>
+    <key>ITSAppUsesNonExemptEncryption</key>
+    <false/>
+    <key>LSRequiresIPhoneOS</key>
+    <true/>
+    <key>NSCameraUsageDescription</key>
+    <string>We need access to your camera to help you capture and share images of vehicle spare parts and workshops in your conversations.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>We need access to your camera to help you capture and share images of vehicle spare parts and workshops in your conversations.</string>
+    <key>UIApplicationSupportsIndirectInputEvents</key>
+    <true/>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>fetch</string>
+        <string>remote-notification</string>
+    </array>
+    <key>UILaunchStoryboardName</key>
+    <string>LaunchScreen.storyboard</string>
+    <key>UIMainStoryboardFile</key>
+    <string>Main</string>
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+    <key>UISupportedInterfaceOrientations~ipad</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationPortraitUpsideDown</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
 </dict>
 </plist>

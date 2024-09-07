@@ -54,6 +54,7 @@ class MessageController extends GetxController {
   String audioPath = "";
   RxBool playing = false.obs;
   RxBool isSending = false.obs;
+  RxInt spareId = 0.obs;
 
   @override
   void onInit() {
@@ -72,6 +73,12 @@ class MessageController extends GetxController {
     startMessagePolling();
   }
 
+  assignSparePartId(int sparePartId) {
+    print("sparePartId = $sparePartId");
+    spareId.value = sparePartId;
+    update();
+  }
+
   Future<void> checkConnection() async {
     checkingConnection.value = true;
     final bool isConnected = await InternetConnectionChecker().hasConnection;
@@ -83,7 +90,7 @@ class MessageController extends GetxController {
     bool isConnected = await InternetConnectionChecker().hasConnection;
     messagePollingTimer = Timer.periodic(Duration(seconds: 3), (timer) {
       if (isConnected) {
-        fetchMessages(receiverData);
+        fetchMessages(receiverData, spareId.value);
       } else {
         Get.snackbar('Error', 'No Connection');
         messagePollingTimer?.cancel();
@@ -101,140 +108,9 @@ class MessageController extends GetxController {
     // audioRecord.dispose();
     audioPlayer.dispose();
     stopMessagePolling();
+    messages.value = [];
     super.onClose();
   }
-
-  // Future<void> startRecording() async {
-  //   try {
-  //     if (await audioRecord.hasPermission()) {
-  //       await audioRecord.start();
-  //       isRecording.value = true;
-  //     }
-  //   } catch (e, stackTrace) {
-  //     print("START RECORDING ERROR: $e");
-  //   }
-  // }
-
-  // Future<void> stopRecording() async {
-  //   try {
-  //     String? path = await audioRecord.stop();
-  //     // recodingNow.value = false;
-  //     isRecording.value = false;
-  //     audioPath = path ?? "";
-  //   } catch (e) {
-  //     print("STOP RECORDING ERROR: $e");
-  //   }
-  // }
-
-  // Future<void> playRecording() async {
-  //   try {
-  //     playing.value = true;
-  //     Source urlSource = UrlSource(audioPath);
-  //     await audioPlayer.play(urlSource);
-  //     audioPlayer.onPlayerStateChanged.listen((PlayerState state) {
-  //       if (state == PlayerState.completed) {
-  //         playing.value = false;
-  //       }
-  //     });
-  //   } catch (e) {
-  //     print("PLAY RECORDING ERROR: $e");
-  //   }
-  // }
-
-  // Future<void> pauseRecording() async {
-  //   try {
-  //     playing.value = false;
-  //     await audioPlayer.pause();
-  //   } catch (e) {
-  //     print("PAUSE RECORDING ERROR: $e");
-  //   }
-  // }
-
-  // RxDouble uploadProgress = 0.0.obs;
-  // Future<void> uploadAndDeleteRecording() async {
-  //   isSending.value = true;
-  //   final userProfile = ConfigPreference.getUserProfile();
-  //   try {
-  //     final url = Uri.parse('${AppConstants.url}/messages/send');
-  //     final file = File(audioPath);
-  //     if (!file.existsSync()) {
-  //       print("UPLOAD FILE NOT EXIST");
-  //       return;
-  //     }
-
-  //     final fileName = file.path.split('/').last;
-
-  //     final request = http.MultipartRequest('POST', url)
-  //       ..files.add(
-  //         http.MultipartFile(
-  //           'audio',
-  //           file.readAsBytes().asStream(),
-  //           file.lengthSync(),
-  //           filename: fileName,
-  //         ),
-  //       )
-  //       ..fields['senderId'] = userProfile['id'].toString()
-  //       ..fields['receiverId'] = receiverData.id.toString()
-  //       ..fields['senderUsername'] = userProfile['userName']
-  //       ..fields['receiverUsername'] = receiverData.userName!
-  //       ..fields['text'] = "null"
-  //       ..fields['image'] = "null";
-
-  //     final streamedResponse = await http.Client().send(request);
-
-  //     int totalBytes = file.lengthSync();
-  //     int bytesUploaded = 0;
-
-  //     streamedResponse.stream
-  //         .transform(StreamTransformer.fromHandlers(
-  //           handleData: (data, sink) {
-  //             bytesUploaded += data.length;
-  //             double progress = bytesUploaded / totalBytes;
-  //             uploadProgress.value = progress;
-  //             sink.add(data);
-  //           },
-  //           handleError: (error, stackTrace, sink) {
-  //             print('UPLOAD ERROR: $error');
-  //             sink.addError(error, stackTrace);
-  //           },
-  //           handleDone: (sink) async {
-  //             sink.close();
-  //           },
-  //         ))
-  //         .listen((_) {});
-
-  //     final response = await http.Response.fromStream(streamedResponse);
-
-  //     if (response.statusCode == 200) {
-  //     } else {
-  //       print('UPLOAD FAILED. STATUS CODE: ${response.statusCode}');
-  //     }
-  //     isSending.value = false;
-  //     uploadProgress.value = 1.0; // Set progress to 100% on success
-  //     audioPath = "";
-  //     playing.value = false;
-  //     // recodingNow.value = true; // Reset to initial recording state
-  //     deleteRecording();
-  //     update();
-  //   } catch (e) {
-  //     print('UPLOAD ERROR: $e');
-  //   }
-  // }
-
-  // Future<void> deleteRecording() async {
-  //   if (audioPath.isNotEmpty) {
-  //     try {
-  //       File file = File(audioPath);
-  //       if (file.existsSync()) {
-  //         file.deleteSync();
-  //         print("FILE DELETED");
-  //       }
-  //     } catch (e) {
-  //       print("FILE DELETE ERROR: $e");
-  //     }
-  //     audioPath = "";
-  //   }
-  // }
 
   void setReceiverData(UserModel receiverDataModel) {
     receiverData = receiverDataModel;
@@ -250,7 +126,7 @@ class MessageController extends GetxController {
         receiverId.value = data['id'].toString();
         receiverUserName.value = data['userName'];
         UserModel owner = UserModel(id: ownerId);
-        fetchMessages(owner);
+        fetchMessages(owner, spareId.value);
       } else {
         print("FAILED TO LOAD USER DATA");
       }
@@ -259,15 +135,17 @@ class MessageController extends GetxController {
     }
   }
 
-  void fetchMessages(UserModel owner) async {
+  void fetchMessages(UserModel owner, int sparePartId) async {
     checkConnection();
     receiverData = owner;
     Map<String, dynamic> userProfile = ConfigPreference.getUserProfile();
-
+    spareId.value = sparePartId;
+    print(
+        '${'${AppConstants.url}/messages/get-both-chats?senderId=${userProfile['id']}&receiverId=${receiverData.id}&sparePartId=${spareId.value}'}');
     try {
       final response = await http.get(
         Uri.parse(
-            '${AppConstants.url}/messages/get-both-chats?senderId=${userProfile['id']}&receiverId=${receiverData.id}'),
+            '${AppConstants.url}/messages/get-both-chats?senderId=${userProfile['id']}&receiverId=${receiverData.id}&sparePartId=${spareId.value}'),
       );
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -285,24 +163,23 @@ class MessageController extends GetxController {
   }
 
   Future<void> sendMessage(bool isAudio) async {
-    // final accessToken = await AuthService.getAuthorizationToken();
     final userProfile = ConfigPreference.getUserProfile();
+    print("sendMessage");
     if (isAudio) {
-      // uploadAndDeleteRecording();
+      // Handle audio sending here
     } else {
+      print('spareId.value = ${spareId.value}');
       if (selectedImage == null && selectedAudio == null) {
         await ApiService.safeApiCall(
           "${AppConstants.url}/messages/send",
           RequestType.post,
-          // headers: {
-          //   "Authorization": "Bearer $accessToken"
-          // },
           data: jsonEncode({
             "text": textController.text.isNotEmpty ? textController.text : "",
             "image": null,
             "audio": null,
             "senderId": userProfile['id'],
             "receiverId": receiverData.id,
+            "sparePartId": spareId.value,
             "senderUsername": userProfile['userName'],
             "receiverUsername": receiverData.userName
           }),
@@ -310,13 +187,11 @@ class MessageController extends GetxController {
             update();
           },
           onSuccess: (response) async {
-            var responseData = response.data;
-
-            apiCallStatus.value = ApiCallStatus.success;
             textController.text = "";
             selectedImage = null;
             selectedAudio = null;
-            fetchMessages(receiverData);
+            fetchMessages(receiverData, spareId.value);
+            apiCallStatus.value = ApiCallStatus.success;
             update();
           },
           onError: (error) {
@@ -325,64 +200,56 @@ class MessageController extends GetxController {
             apiCallStatus.value = ApiCallStatus.error;
             CustomSnackBar.showCustomErrorToast(
               title: 'Error',
-              message: 'Failed to send message $error',
+              message: 'Failed to send message: $error',
               duration: Duration(seconds: 2),
             );
             textController.text = "";
             selectedImage = null;
             selectedAudio = null;
-            fetchMessages(receiverData);
+            fetchMessages(receiverData, spareId.value);
             update();
           },
         );
-        textController.text = "";
       } else {
         var request = http.MultipartRequest(
           'POST',
           Uri.parse('${AppConstants.url}/messages/send'),
         );
 
-        // request.headers['Authorization'] = 'Bearer $accessToken';
-
         request.fields['senderId'] = userProfile['id'].toString();
         request.fields['receiverId'] = receiverData.id.toString();
+        request.fields['sparePartId'] = spareId.value.toString();
         request.fields['senderUsername'] = userProfile['userName'];
         request.fields['receiverUsername'] = receiverData.userName!;
         request.fields['text'] = "null";
         request.fields['audio'] = "null";
-        // Handle image attachment
-        // Handle image attachment
-        if (selectedImage != null) {
-          var imageStream = http.ByteStream(selectedImage!.openRead());
-          var imageLength = await selectedImage!.length();
-
-          var imageFile = http.MultipartFile(
-            'image',
-            imageStream,
-            imageLength,
-            filename: selectedImage!.path.split('/').last,
-          );
-
-          request.files.add(imageFile);
-        } else {
-          request.fields['image'] = "null";
-        }
-
+        var imageStream = http.ByteStream(selectedImage!.openRead());
+        var imageLength = await selectedImage!.length();
+        var imageFile = http.MultipartFile(
+          'image',
+          imageStream,
+          imageLength,
+          filename: selectedImage!.path.split('/').last,
+        );
+        request.files.add(imageFile);
+        // if (selectedImage != null) {
+        request.files.add(imageFile);
+        // } else {
+        // request.fields['image'] = "null";
         try {
+          // }
           var response = await request.send();
           var responseString = await response.stream.bytesToString();
-
           if (response.statusCode == 201) {
             textController.text = "";
             selectedImage = null;
             selectedAudio = null;
-            fetchMessages(receiverData);
-          } else {}
-
-          // return http.Response(responseString, response.statusCode);
+            fetchMessages(receiverData, spareId.value);
+          } else {
+            // Handle non-201 responses
+          }
         } catch (e) {
           Get.snackbar('Error', 'An error occurred: $e');
-          // return http.Response("Error", 500);
         }
       }
     }

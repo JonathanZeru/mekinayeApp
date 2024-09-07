@@ -55,6 +55,7 @@ class WorkshopScreen extends GetView<CarBrandsController> {
                     return GestureDetector(
                       onTap: () {
                         Get.to(() => SingleSparePartScreen(
+                            brandName: carBrand.name,
                             carBrandId: carBrand.id,
                             ownerId: carBrand.ownerId,
                             spareParts: carBrand.spareParts!,

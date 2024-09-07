@@ -27,11 +27,11 @@ class _ChatListScreenState extends State<ChatListScreen> {
   bool hasConnection = true;
   bool checkingConnection = true;
 
-
   @override
   void initState() {
     checkConnection();
   }
+
   Future<void> checkConnection() async {
     setState(() {
       checkingConnection = true;
@@ -50,15 +50,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     AppTheme theme = AppTheme.of(context);
-    if(checkingConnection == true){
+    if (checkingConnection == true) {
       return SafeArea(
         child: Scaffold(
-          body: Center(
-              child: Loading()
-          ),
+          body: Center(child: Loading()),
         ),
       );
     }
@@ -66,9 +65,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
       return ErrorScreen(onPress: checkConnection);
     }
     if (hasConnection == false && checkingConnection == false) {
-      return ErrorScreen(
-        onPress: checkConnection
-      );
+      return ErrorScreen(onPress: checkConnection);
     }
 
     return Scaffold(
@@ -81,7 +78,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
             return Center(child: Loading());
           }
 
-          if (controller.isLoggedIn.value == false && !controller.isLoading.value) {
+          if (controller.isLoggedIn.value == false &&
+              !controller.isLoading.value) {
             return Center(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -142,7 +140,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
               ),
             );
           }
-
+          if (controller.isLoading.value == true) {
+            return Center(child: Loading());
+          }
           return ListView.builder(
             shrinkWrap: true,
             itemCount: controller.users.length,
@@ -150,27 +150,42 @@ class _ChatListScreenState extends State<ChatListScreen> {
               final user = controller.users[index];
               final lastMessage = controller.lastMessages[index];
 
-              return Card(
-                margin: EdgeInsets.all(10),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    child: Text(user.userName![0]),
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Card(
+                    margin: EdgeInsets.all(10),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        child: Text(user.userName![0]),
+                      ),
+                      title: Text(user.userName!),
+                      subtitle: lastMessage.text != 'null'
+                          ? Text(lastMessage.text!, maxLines: 2)
+                          : (lastMessage.audioUrl != 'null'
+                              ? Icon(Icons.audiotrack)
+                              : null),
+                      trailing: Text(duTimeLineFormat(lastMessage.createdAt!)),
+                      onTap: () {
+                        Get.to(() => MessagingScreen(
+                              sparePartId: lastMessage.sparePartId!,
+                              brandName: "",
+                              sparePartName: "",
+                              ownerId: user.id!,
+                              owner: user,
+                              args: {'isFromNotification': false},
+                            ));
+                      },
+                    ),
                   ),
-                  title: Text(user.userName!),
-                  subtitle: lastMessage.text != 'null'
-                      ? Text(lastMessage.text!, maxLines: 2)
-                      : (lastMessage.audioUrl != 'null'
-                      ? Icon(Icons.audiotrack)
-                      : null),
-                  trailing: Text(duTimeLineFormat(lastMessage.createdAt!)), // Show formatted date
-                  onTap: () {
-                    Get.to(() => MessagingScreen(
-                      ownerId: user.id!,
-                      owner: user,
-                      args: {'isFromNotification': false},
-                    ));
-                  },
-                ),
+                  Container(
+                    margin: EdgeInsets.only(left: 10),
+                    child: Text(
+                      "Your chat for ${lastMessage.sparePart!.name}",
+                      style: theme.typography.titleMedium,
+                    ),
+                  )
+                ],
               );
             },
           );

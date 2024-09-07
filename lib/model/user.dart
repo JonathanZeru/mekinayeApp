@@ -1,3 +1,5 @@
+import 'package:mekinaye/model/spare_part.dart';
+
 class UserModel {
   final int? id;
   final String? firstName;
@@ -9,29 +11,27 @@ class UserModel {
   final String? phoneNumber;
   final String? type;
 
-  UserModel({
-    this.id,
-    this.firstName,
-    this.lastName,
-    this.email,
-    this.password,
-    this.status,
-    this.userName,
-    this.phoneNumber,
-    this.type,
-  });
+  UserModel(
+      {this.id,
+      this.firstName,
+      this.lastName,
+      this.email,
+      this.password,
+      this.status,
+      this.userName,
+      this.phoneNumber,
+      this.type});
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      firstName: json['firstName'],
-      lastName: json['lastName'],
-      email: json['email'],
-      password: json['password'],
-      status: json['status'],
-      userName: json['userName'],
-      phoneNumber: json['phoneNumber'],
-      type: json['type'],
-    );
+        firstName: json['firstName'],
+        lastName: json['lastName'],
+        email: json['email'],
+        password: json['password'],
+        status: json['status'],
+        userName: json['userName'],
+        phoneNumber: json['phoneNumber'],
+        type: json['type']);
   }
   factory UserModel.fromWorkShopJson(Map<String, dynamic> json) {
     return UserModel(
@@ -55,13 +55,12 @@ class UserModel {
       'type': type,
     };
   }
+
   Map<String, dynamic> toUserJson() {
-    return {
-      'password': password,
-      'userName': userName
-    };
+    return {'password': password, 'userName': userName};
   }
-  Map<String, dynamic> toUpdate(){
+
+  Map<String, dynamic> toUpdate() {
     return {
       'firstName': firstName,
       'lastName': lastName,

@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:mekinaye/config/themes/data/app_theme.dart';
 import 'package:mekinaye/screen/spareparts/spare_part_screen.dart';
 import 'package:mekinaye/screen/workshop/workshop_screen.dart';
@@ -10,7 +9,6 @@ import 'package:mekinaye/screen/rules/rules_screen.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
 import '../../config/config_preference.dart';
-import '../../controller/ads/ads_controller.dart';
 import '../../controller/connection/internet_connection_controller.dart';
 import '../../layout/home/ads_carousel.dart';
 import '../../service/api_service.dart';
@@ -40,66 +38,24 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final AdsController adsController = Get.put(AdsController());  // Instantiate AdsController
-  final internetController = Get.put(InternetController());
-
-  Future<void> _refreshAds() async {
-    await adsController.fetchAds();  // Call the fetchAds method to refresh ads
-  }
-  bool hasConnection = true;
-  bool checkingConnection = true;
-
-
-  Future<void> checkConnection() async {
-    setState(() {
-      checkingConnection = true;
-    });
-    final bool isConnected = await InternetConnectionChecker().hasConnection;
-    if (isConnected) {
-      _refreshAds();
-      setState(() {
-        hasConnection = true;
-        checkingConnection = false;
-      });
-    } else {
-      setState(() {
-        hasConnection = false;
-        checkingConnection = false;
-      });
-    }
-  }
-  @override
-  void initState() {
-    checkConnection();
-  }
-
   @override
   Widget build(BuildContext context) {
     AppTheme theme = AppTheme.of(context);
     final GlobalKey<SliderDrawerState> _sliderDrawerKey =
-    GlobalKey<SliderDrawerState>();
+        GlobalKey<SliderDrawerState>();
     late String title;
-
-      if(checkingConnection == true){
-        return SafeArea(
-          child: Scaffold(
-            body: Center(
-                child: Loading()
-            ),
-          ),
-        );
-      }
-      if (hasConnection == false) {
-        return ErrorScreen(onPress: checkConnection);
-      }
-
+    final internetController = Get.put(InternetController());
+    if (internetController.hasConnection.value == false &&
+        internetController.checkingConnection.value == false) {
+      return ErrorScreen(onPress: internetController.checkingConnection);
+    }
     return SafeArea(
       child: Scaffold(
-        backgroundColor: theme.cardBackground,
+        backgroundColor: theme.primaryBackground,
         body: SliderDrawer(
             appBar: SliderAppBar(
               drawerIconColor: theme.primary,
-              appBarColor: theme.cardBackground,
+              appBarColor: Color(0xFFF5F8FF),
               title: Container(
                 width: 80,
                 height: 80,
@@ -126,78 +82,79 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             child: Container(
-              color: theme.cardBackground,
+              color: theme.primaryBackground,
               child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    AdsCarousel(),  // This widget will display ads
-                    GridView.builder(
-                        shrinkWrap: true,
-                        scrollDirection: Axis.vertical,
-                        physics: BouncingScrollPhysics(),
-                        itemCount: AppConstants.homeScreenGrid.length,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2, childAspectRatio: 1.3),
-                        itemBuilder: (context, j) {
-                          return GestureDetector(
-                            onTap: () {
-                              switch (AppConstants.homeScreenGrid[j]['name']) {
-                                case "Ethio Spare":
-                                  Get.to(() => WorkshopScreen());
-                                  break;
-                                case "Ethio Garage":
-                                  Get.to(() => SparePartScreen());
-                                  break;
-                                case "Traffic Police":
-                                  pushNewScreen(context,
-                                      screen: RulesScreen(isFromHome: true));
-                                  break;
-                                case "Gas Station":
-                                  Get.to(() => MapScreen());
-                                  break;
-                              }
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Container(
-                                height: 50,
-                                width: 70,
-                                decoration: BoxDecoration(
-                                  color: theme.accent1,
-                                  borderRadius:
-                                  BorderRadius.all(Radius.circular(20)),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    // Icon(
-                                    //   AppConstants.homeScreenGrid[j]['icon'],
-                                    //   size: 50.sp,
-                                    //   color: Colors.black,
-                                    // ),
-                                    Image.asset(
-                                        AppConstants.homeScreenGrid[j]['image'],
-                                        width: 70,
-                                        height: 70),
-                                    Text(AppConstants.homeScreenGrid[j]['name']!,
-                                        style:
-                                        theme.typography.titleMedium.copyWith(
-                                          color: Colors.black,
-                                        ))
-                                  ],
-                                ),
+                  child: Column(
+                children: [
+                  AdsCarousel(),
+                  GridView.builder(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.vertical,
+                      physics: BouncingScrollPhysics(),
+                      itemCount: AppConstants.homeScreenGrid.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2, childAspectRatio: 1.3),
+                      itemBuilder: (context, j) {
+                        return GestureDetector(
+                          onTap: () {
+                            switch (AppConstants.homeScreenGrid[j]['name']) {
+                              case "Ethio Spare":
+                                Get.to(() => WorkshopScreen());
+                                break;
+                              case "Ethio Garage":
+                                Get.to(() => SparePartScreen());
+                                break;
+                              case "Traffic Police":
+                                pushNewScreen(context,
+                                    screen: RulesScreen(isFromHome: true));
+                                break;
+                              case "Gas Station":
+                                Get.to(() => MapScreen());
+                                break;
+                            }
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Container(
+                              height: 50,
+                              width: 70,
+                              decoration: BoxDecoration(
+                                color: theme.cardBackground,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  // Icon(
+                                  //   AppConstants.homeScreenGrid[j]['icon'],
+                                  //   size: 50.sp,
+                                  //   color: Colors.black,
+                                  // ),
+                                  Image.asset(
+                                      AppConstants.homeScreenGrid[j]['image'],
+                                      width: 70,
+                                      height: 70),
+                                  Text(
+                                    AppConstants.homeScreenGrid[j]['name']!,
+                                    style: theme.typography.titleMedium
+                                        .copyWith(
+                                            color: theme.primaryText,
+                                            fontSize: 16.0,
+                                            fontWeight: FontWeight.bold),
+                                  )
+                                ],
                               ),
                             ),
-                          );
-                        })
-                  ],
-                ),
-              ),
+                          ),
+                        );
+                      })
+                ],
+              )),
             )),
       ),
     );
-
   }
 }
 
@@ -217,6 +174,7 @@ class _SliderView extends StatefulWidget {
 class _SliderViewState extends State<_SliderView> {
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
     checkLogin();
   }
@@ -268,44 +226,44 @@ class _SliderViewState extends State<_SliderView> {
           isLoading
               ? Center(child: Loading())
               : isLoggedIn
-              ? Text(
-            '${user['firstName']} ${user['lastName']}',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-              fontSize: 30,
-            ),
-          )
-              : Column(
-            children: [
-              Text(
-                '${user['login']}',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Button(
-                  text: "Login in",
-                  onPressed: () async {
-                    Get.to(() => LoginScreen());
-                  },
-                  options: ButtonOptions(
-                    width: double.infinity,
-                    height: 45.h,
-                    padding: EdgeInsets.all(10.h),
-                    textStyle: theme.typography.titleMedium
-                        .copyWith(color: theme.primaryBtnText),
-                  ),
-                ),
-              )
-            ],
-          ),
+                  ? Text(
+                      '${user['firstName']} ${user['lastName']}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 30,
+                      ),
+                    )
+                  : Column(
+                      children: [
+                        Text(
+                          '${user['login']}',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Button(
+                            text: "LogIn",
+                            onPressed: () async {
+                              Get.to(() => LoginScreen());
+                            },
+                            options: ButtonOptions(
+                              width: double.infinity,
+                              height: 45.h,
+                              padding: EdgeInsets.all(10.h),
+                              textStyle: theme.typography.titleMedium
+                                  .copyWith(color: theme.primaryBtnText),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
           const SizedBox(
             height: 20,
           ),
@@ -317,155 +275,149 @@ class _SliderViewState extends State<_SliderView> {
             Menu(Icons.car_crash_outlined, 'About'),
             isLoggedIn
                 ? Menu(Icons.arrow_back_ios, 'LogOut')
-                : Menu(Icons.login, 'Login in')
+                : Menu(Icons.login, 'LogIn')
           ]
               .map((menu) => _SliderMenuItem(
-              title: menu.title,
-              iconData: menu.iconData,
-              onTap: (String e) async {
-                if (e == "Profile") {
-                  if (isLoggedIn) {
-                    Get.to(() => ProfileScreen());
-                  } else {
-                    Get.to(() => LoginScreen());
-                  }
-                }
-                if (e == "Privacy policy") {
-                  Get.to(() => PrivacyPolicyScreen());
-                }
-                if (e == "Terms and conditions") {
-                  Get.to(() => TermsAndConditionsScreen());
-                }
-                if (e == "FAQ") {
-                  Get.to(() => FaqScreen());
-                }
-                if (e == "About") {
-                  Get.to(() => AboutScreen());
-                }
-                if (e == "LogOut") {
-                    bool? logoutConfirmed = await showDialog<bool>(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text("Are you sure?",
-                              style: theme.typography.titleMedium.copyWith(
-                                  color: theme.primaryText, fontSize: 16.sp)),
-                          content: Text("Do you want to log out?",
-                              style: theme.typography.titleMedium.copyWith(
-                                  color: theme.primaryText, fontSize: 14.sp)),
-                          actions: [
-                            Button(
-                              text: "No",
-                              onPressed: () {
-                                Navigator.pop(context, false);
-                              },
-                              options: ButtonOptions(
-                                  height: 35.h,
-                                  width: 60.w,
-                                  color: theme.error,
-                                  textStyle: theme.typography.titleMedium
-                                      .copyWith(
-                                      color: theme.primaryBackground,
-                                      fontSize: 14.sp)),
-                            ),
-                            SizedBox(width: 10.w),
-                            Button(
-                              text: "Yes",
-                              onPressed: () {
-                                Navigator.pop(context, true);
-                              },
-                              options: ButtonOptions(
-                                  height: 35.h,
-                                  width: 60.w,
-                                  textStyle: theme.typography.titleMedium
-                                      .copyWith(
-                                      color: theme.primaryBackground,
-                                      fontSize: 14.sp)),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-
-                    if (logoutConfirmed == true) {
-                      final userProfile = ConfigPreference.getUserProfile();
-                      Map<String, dynamic> body = {
-                        "userId": userProfile['id'],
-                        "fcmToken": ""
-                      };
-
-                      await ApiService.safeApiCall(
-                        "${AppConstants.url}/users/update-token",
-                        RequestType.post,
-                        data: body,
-                        onLoading: () {},
-                        onSuccess: (response) {},
-                        onError: (error) {},
-                      );
-                      AuthService.logout();
-                      Get.offAllNamed(AppRoutes.login);
+                  title: menu.title,
+                  iconData: menu.iconData,
+                  onTap: (String e) async {
+                    if (e == "Profile") {
+                      if (isLoggedIn) {
+                        Get.to(() => ProfileScreen());
+                      } else {
+                        Get.to(() => LoginScreen());
+                      }
                     }
+                    if (e == "Privacy policy") {
+                      Get.to(() => PrivacyPolicyScreen());
+                    }
+                    if (e == "Terms and conditions") {
+                      Get.to(() => TermsAndConditionsScreen());
+                    }
+                    if (e == "FAQ") {
+                      Get.to(() => FaqScreen());
+                    }
+                    if (e == "About") {
+                      Get.to(() => AboutScreen());
+                    }
+                    if (e == "LogOut") {
+                      if (isLoggedIn) {
+                        bool? logoutConfirmed = await showDialog<bool>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text("Are you sure?",
+                                  style: theme.typography.titleMedium.copyWith(
+                                      color: theme.primaryText,
+                                      fontSize: 16.sp)),
+                              content: Text("Do you want to log out?",
+                                  style: theme.typography.titleMedium.copyWith(
+                                      color: theme.primaryText,
+                                      fontSize: 14.sp)),
+                              actions: [
+                                Button(
+                                  text: "No",
+                                  onPressed: () {
+                                    Navigator.pop(context, false);
+                                  },
+                                  options: ButtonOptions(
+                                      height: 35.h,
+                                      width: 60.w,
+                                      color: theme.error,
+                                      textStyle: theme.typography.titleMedium
+                                          .copyWith(
+                                              color: theme.primaryBackground,
+                                              fontSize: 14.sp)),
+                                ),
+                                SizedBox(width: 10.w),
+                                Button(
+                                  text: "Yes",
+                                  onPressed: () {
+                                    Navigator.pop(context, true);
+                                  },
+                                  options: ButtonOptions(
+                                      height: 35.h,
+                                      width: 60.w,
+                                      textStyle: theme.typography.titleMedium
+                                          .copyWith(
+                                              color: theme.primaryBackground,
+                                              fontSize: 14.sp)),
+                                ),
+                              ],
+                            );
+                          },
+                        );
 
-                }
-                if (e == "Login in") {
-                  Get.to(() => LoginScreen());
-                }
-              }))
-              .toList()
+                        if (logoutConfirmed == true) {
+                          final userProfile = ConfigPreference.getUserProfile();
+                          Map<String, dynamic> body = {
+                            "userId": userProfile['id'],
+                            "fcmToken": ""
+                          };
+
+                          await ApiService.safeApiCall(
+                            "${AppConstants.url}/users/update-token",
+                            RequestType.post,
+                            data: body,
+                            onLoading: () {},
+                            onSuccess: (response) {},
+                            onError: (error) {},
+                          );
+                          AuthService.logout();
+                          Get.offAllNamed(AppRoutes.login);
+                        }
+                      } else {
+                        CustomSnackBar.showCustomSnackBar(
+                          title: 'Login',
+                          message: 'Please Login or Sign up',
+                          duration: Duration(seconds: 2),
+                        );
+                        Get.to(() => LoginScreen());
+                      }
+                    }
+                    if (e == "Login in") {
+                      Get.to(() => LoginScreen());
+                    }
+                  }))
+              .toList(),
         ],
       ),
     );
   }
 }
 
-class Menu {
-  final IconData iconData;
-  final String title;
-  Menu(this.iconData, this.title);
-}
-
 class _SliderMenuItem extends StatelessWidget {
-  final IconData iconData;
   final String title;
+  final IconData iconData;
   final Function(String)? onTap;
-  const _SliderMenuItem({
-    Key? key,
-    required this.title,
-    required this.iconData,
-    this.onTap,
-  }) : super(key: key);
+
+  const _SliderMenuItem(
+      {Key? key,
+      required this.title,
+      required this.iconData,
+      required this.onTap})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final AppTheme theme = AppTheme.of(context);
-    return GestureDetector(
-      onTap: () => onTap?.call(title),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 15),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 15,
-            ),
-            Icon(
-              iconData,
-              color: theme.primary,
-            ),
-            SizedBox(
-              width: 15,
-            ),
-            Expanded(
-              child: Text(
-                title,
-                style: theme.typography.titleMedium.copyWith(color: theme.primaryText),
-              ),
-            ),
-            SizedBox(
-              width: 15,
-            ),
-          ],
-        ),
-      ),
-    );
+    return ListTile(
+        title: Text(title, style: const TextStyle(color: Colors.black)),
+        leading: Icon(iconData, color: Colors.black),
+        onTap: () => onTap?.call(title));
   }
+}
+
+class Quotes {
+  final MaterialColor color;
+  final String author;
+  final String quote;
+
+  Quotes(this.color, this.author, this.quote);
+}
+
+class Menu {
+  final IconData iconData;
+  final String title;
+
+  Menu(this.iconData, this.title);
 }

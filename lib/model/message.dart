@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:mekinaye/model/spare_part.dart';
 import 'package:mekinaye/util/app_constants.dart'; // For date formatting, optional
 
 class Message {
@@ -10,21 +11,24 @@ class Message {
   final int? receiverId;
   final String? senderUsername;
   final String? receiverUsername;
+  final int? sparePartId;
+  final SparePart? sparePart;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
-  Message({
-    this.id,
-    this.imageUrl,
-    this.audioUrl, // Initialize audioUrl in the constructor
-    this.text,
-    this.senderId,
-    this.receiverId,
-    this.senderUsername,
-    this.receiverUsername,
-    this.createdAt,
-    this.updatedAt,
-  });
+  Message(
+      {this.id,
+      this.imageUrl,
+      this.audioUrl, // Initialize audioUrl in the constructor
+      this.text,
+      this.senderId,
+      this.receiverId,
+      this.senderUsername,
+      this.receiverUsername,
+      this.createdAt,
+      this.updatedAt,
+      this.sparePart,
+      this.sparePartId});
 
   Map<String, dynamic> toJson() {
     return {
@@ -44,10 +48,10 @@ class Message {
   factory Message.fromJson(Map<String, dynamic> json) {
     String image = 'null';
     String audio = 'null';
-    if(json['imageUrl'] != null){
+    if (json['imageUrl'] != null) {
       image = '${AppConstants.imageUrl}${json['imageUrl']}';
     }
-    if(json['audioUrl'] != null){
+    if (json['audioUrl'] != null) {
       audio = '${AppConstants.imageUrl}${json['audioUrl']}';
     }
     return Message(
@@ -59,7 +63,8 @@ class Message {
       receiverId: json['receiverId'],
       senderUsername: json['senderUsername'],
       receiverUsername: json['receiverUsername'],
-      createdAt: DateTime.parse(json['createdAt']), // Parse DateTime from string
+      createdAt:
+          DateTime.parse(json['createdAt']), // Parse DateTime from string
     );
   }
 }

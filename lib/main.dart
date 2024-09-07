@@ -66,7 +66,12 @@ class MyApp extends StatelessWidget {
                     as Map<String, dynamic>;
                 print("args = $args");
                 return MessagingScreen(
-                    ownerId: 0, owner: UserModel(), args: args);
+                    sparePartId: 0,
+                    brandName: "",
+                    sparePartName: '',
+                    ownerId: 0,
+                    owner: UserModel(),
+                    args: args);
               }, // Replace with actual data or use arguments
             },
             onGenerateRoute: (settings) {
@@ -75,10 +80,13 @@ class MyApp extends StatelessWidget {
                     as int; // Adjust type based on your arguments
                 return MaterialPageRoute(
                   builder: (context) => MessagingScreen(
-                      // Pass the messageId or other data here
-                      ownerId: messageId,
-                      owner: UserModel(),
-                      args: {'isFromNotification': false}),
+                    sparePartId: 0,
+                    brandName: "",
+                    // Pass the messageId or other data here
+                    ownerId: messageId,
+                    owner: UserModel(),
+                    args: {'isFromNotification': false}, sparePartName: '',
+                  ),
                 );
               }
               return null;

@@ -19,15 +19,18 @@ class LoginForm extends GetView<LoginPageController> {
     return Form(
       key: controller.formKey,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text("User Name"),
           CustomInputField(
+            label: "User Name",
             textEditingController: controller.userNameController,
-            hint: "Username",
+            hint: "John",
             obscureText: false,
             type: TextInputType.emailAddress,
             isDense: true,
             prefixIcon: Icon(
-              Icons.email_outlined,
+              Icons.person,
               size: 20.sp,
               color: theme.primaryText.withOpacity(0.50),
             ),
@@ -36,12 +39,14 @@ class LoginForm extends GetView<LoginPageController> {
           SizedBox(
             height: 8.h,
           ),
+          Text("Password"),
           ValueListenableBuilder<bool>(
             valueListenable: controller.obscurePassword,
             builder: (context, value, child) {
               return CustomInputField(
+                label: "Password",
                 textEditingController: controller.passwordController,
-                hint: "Password",
+                hint: "********",
                 obscureText: value,
                 passwordInput: true,
                 type: TextInputType.text,

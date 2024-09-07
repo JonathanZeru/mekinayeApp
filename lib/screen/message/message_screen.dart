@@ -22,10 +22,16 @@ class MessagingScreen extends StatefulWidget {
   final int ownerId;
   final UserModel owner;
   final Map<String, dynamic> args;
+  final String sparePartName;
+  final int sparePartId;
+  final String brandName;
 
   const MessagingScreen(
       {super.key,
       required this.ownerId,
+      required this.sparePartName,
+      required this.sparePartId,
+      required this.brandName,
       required this.owner,
       required this.args});
 
@@ -40,13 +46,13 @@ class _MessagingScreenState extends State<MessagingScreen> {
   @override
   Widget build(BuildContext context) {
     final internetController = Get.put(InternetController());
-
+    controller.assignSparePartId(widget.sparePartId);
     AppTheme theme = AppTheme.of(context);
     controller.setReceiverData(widget.owner);
     if (widget.args['isFromNotification']) {
       controller.fetchReceiverData(widget.args['receiverId']);
     } else {
-      controller.fetchMessages(widget.owner);
+      controller.fetchMessages(widget.owner, widget.sparePartId);
     }
     if (internetController.hasConnection.value == false &&
         internetController.checkingConnection.value == false) {
@@ -60,7 +66,12 @@ class _MessagingScreenState extends State<MessagingScreen> {
         ),
         body: Column(
           children: [
-            Expanded(
+            if (widget.sparePartName != '')
+              Text(
+                "You want to buy ${widget.sparePartName} of a ${widget.brandName}?",
+                style: theme.typography.titleMedium,
+              ),
+            const Expanded(
               child: ChatList(),
             ),
             // isSending

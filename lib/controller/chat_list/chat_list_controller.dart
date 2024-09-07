@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:mekinaye/model/spare_part.dart';
 import 'dart:convert';
 
 import '../../model/message.dart';
@@ -25,10 +26,10 @@ class ChatListController extends GetxController {
     if (isConnected) {
       if (isLoggedIn.value) {
         fetchUsersAndLastMessages();
-      }else{
+      } else {
         isLoading.value = false;
       }
-    }else{
+    } else {
       isLoading.value = false;
     }
   }
@@ -38,10 +39,10 @@ class ChatListController extends GetxController {
 
     Map<String, dynamic> userProfile = ConfigPreference.getUserProfile();
 
-
     try {
       final response = await http.get(
-        Uri.parse('${AppConstants.url}/messages/get-chats?id=${userProfile['id']}'),
+        Uri.parse(
+            '${AppConstants.url}/messages/get-chats?id=${userProfile['id']}'),
         // headers: {
         //   'Authorization': 'Bearer $accessToken',
         // },
@@ -50,20 +51,23 @@ class ChatListController extends GetxController {
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         users.value = data.map((item) {
+          print(item);
           final userData = item['user'];
           return UserModel(
-            id: userData['id'],
-            userName: userData['userName'],
-            firstName: userData['firstName'],
-            lastName: userData['lastName'],
-            email: userData['email'],
-          );
+              id: userData['id'],
+              userName: userData['userName'],
+              firstName: userData['firstName'],
+              lastName: userData['lastName'],
+              email: userData['email']);
         }).toList();
 
         lastMessages.value = data.map((item) {
           final messageData = item['lastMessage'];
+          print(messageData);
           return Message(
-            id: null, // Set to null or appropriate value if needed
+            id: null,
+            sparePartId: messageData['sparePartId'],
+            sparePart: SparePart.fromWorkshopJson(messageData['sparePart']),
             imageUrl: messageData['imageUrl'] != 'null'
                 ? '${AppConstants.imageUrl}${messageData['imageUrl']}'
                 : null,
