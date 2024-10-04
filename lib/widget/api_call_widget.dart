@@ -23,8 +23,7 @@ class ApiCallWidget extends StatelessWidget {
     switch (status) {
       case ApiCallStatus.loading || ApiCallStatus.refresh:
         return Center(
-            child: SizedBox(
-                width: 50, height: 50, child: Loading()));
+            child: Loading());
       case ApiCallStatus.success:
         return child;
       case ApiCallStatus.error:
@@ -38,7 +37,7 @@ class ApiCallWidget extends StatelessWidget {
         );
       case ApiCallStatus.empty:
         return const Center(
-          child: Text('No data available'),
+          child: Text('No data available')
         );
       case ApiCallStatus.holding:
       default:

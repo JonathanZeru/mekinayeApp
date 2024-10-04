@@ -55,11 +55,11 @@ class WorkshopScreen extends GetView<CarBrandsController> {
                     return GestureDetector(
                       onTap: () {
                         Get.to(() => SingleSparePartScreen(
-                            brandName: carBrand.name,
-                            carBrandId: carBrand.id,
-                            ownerId: carBrand.ownerId,
+                            brandName: carBrand.name!,
+                            carBrandId: carBrand.id!,
+                            ownerId: carBrand.ownerId!,
                             spareParts: carBrand.spareParts!,
-                            owner: carBrand.owner));
+                            owner: carBrand.owner!));
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
@@ -75,7 +75,7 @@ class WorkshopScreen extends GetView<CarBrandsController> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               CachedNetworkImage(
-                                imageUrl: carBrand.image, // Image URL
+                                imageUrl: carBrand.image!, // Image URL
                                 height: 100.h,
                                 placeholder: (context, url) =>
                                     Center(child: CircularProgressIndicator()),
@@ -86,7 +86,7 @@ class WorkshopScreen extends GetView<CarBrandsController> {
                                 ),
                               ),
                               Text(
-                                carBrand.name,
+                                carBrand.name!,
                                 style: theme.typography.titleMedium.copyWith(
                                     color: theme.primaryText,
                                     fontSize: 16.0,

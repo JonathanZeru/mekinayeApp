@@ -4,28 +4,28 @@ import 'package:mekinaye/model/user.dart';
 import '../util/app_constants.dart';
 
 class CarBrand {
-  final int id;
-  final String name;
-  final String description;
-  final String phoneNumber;
-  final String image;
-  final int ownerId;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final int? id;
+  final String? name;
+  final String? description;
+  final String? phoneNumber;
+  final String? image;
+  final int? ownerId;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
   final List<SparePart>? spareParts;
-  final UserModel owner; // Add the owner field
+  final UserModel? owner; // Add the owner field
 
   CarBrand({
-    required this.id,
-    required this.name,
-    required this.description,
-    required this.phoneNumber,
-    required this.image,
-    required this.ownerId,
-    required this.createdAt,
-    required this.updatedAt,
+    this.id,
+    this.name,
+    this.description,
+    this.phoneNumber,
+    this.image,
+    this.ownerId,
+    this.createdAt,
+    this.updatedAt,
     this.spareParts,
-    required this.owner, // Initialize the owner
+    this.owner, // Initialize the owner
   });
 
   factory CarBrand.fromJson(Map<String, dynamic> json) {
@@ -47,7 +47,18 @@ class CarBrand {
       owner: UserModel.fromWorkShopJson(json['owner']), // Parse the owner from JSON
     );
   }
-
+  factory CarBrand.fromMessageJson(Map<String, dynamic> json) {
+    print(json);
+    String image = '${AppConstants.imageUrl}${json['image']}';
+    return CarBrand(
+      id: json['id'],
+      name: json['name'],
+      description: json['description'],
+      phoneNumber: json['phoneNumber'],
+      image: image,
+      ownerId: json['ownerId'],
+    );
+  }
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -56,10 +67,10 @@ class CarBrand {
       'phoneNumber': phoneNumber,
       'image': image,
       'ownerId': ownerId,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'createdAt': createdAt!.toIso8601String(),
+      'updatedAt': updatedAt!.toIso8601String(),
       'spareParts': spareParts?.map((sp) => sp.toJson()).toList(),
-      'owner': owner.toJson(), // Include the owner in the JSON output
+      'owner': owner!.toJson(), // Include the owner in the JSON output
     };
   }
 }

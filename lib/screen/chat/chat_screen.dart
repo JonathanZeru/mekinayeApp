@@ -181,7 +181,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                   Container(
                     margin: EdgeInsets.only(left: 10),
                     child: Text(
-                      "Your chat for ${lastMessage.sparePart!.name}",
+                      "Your chat for ${lastMessage.sparePart!.name} of ${lastMessage.sparePart!.carBrand!.name}",
                       style: theme.typography.titleMedium,
                     ),
                   )

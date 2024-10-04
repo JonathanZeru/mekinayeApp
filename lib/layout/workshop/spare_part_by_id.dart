@@ -86,7 +86,7 @@ class SingleSparePartScreen extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: Container(
-                      height: 70,
+                      height: 75,
                       width: 70,
                       decoration: BoxDecoration(
                         color: theme.cardBackground,
@@ -109,10 +109,12 @@ class SingleSparePartScreen extends StatelessWidget {
                           SizedBox(height: 8.h),
                           Text(
                             sparePart.name,
+                            textAlign: TextAlign.center,
                             style: theme.typography.titleMedium.copyWith(
                                 color: theme.primaryText,
                                 fontSize: 16.0,
-                                fontWeight: FontWeight.bold),
+                                fontWeight: FontWeight.bold
+                            ),
                           ),
                           Text(
                             sparePart.description,
@@ -126,7 +128,7 @@ class SingleSparePartScreen extends StatelessWidget {
                             'Price: ${sparePart.price.toStringAsFixed(2)} ETB',
                             style: theme.typography.titleMedium.copyWith(
                                 color: theme.primaryText,
-                                fontSize: 16.0,
+                                fontSize: 13.0,
                                 fontWeight: FontWeight.bold),
                           ),
                         ],

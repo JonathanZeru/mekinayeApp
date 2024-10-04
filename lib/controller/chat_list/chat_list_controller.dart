@@ -50,6 +50,7 @@ class ChatListController extends GetxController {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
+        print(response.body);
         users.value = data.map((item) {
           print(item);
           final userData = item['user'];
@@ -67,14 +68,14 @@ class ChatListController extends GetxController {
           return Message(
             id: null,
             sparePartId: messageData['sparePartId'],
-            sparePart: SparePart.fromWorkshopJson(messageData['sparePart']),
+            sparePart: SparePart.fromMessageJson(messageData['sparePart']),
             imageUrl: messageData['imageUrl'] != 'null'
                 ? '${AppConstants.imageUrl}${messageData['imageUrl']}'
-                : null,
+                : '',
             audioUrl: messageData['audioUrl'] != 'null'
                 ? '${AppConstants.imageUrl}${messageData['audioUrl']}'
-                : null,
-            text: messageData['content'],
+                : '',
+            text: messageData['text'],
             senderUsername: messageData['senderUsername'],
             receiverUsername: messageData['receiverUsername'],
             createdAt: DateTime.parse(messageData['createdAt']),

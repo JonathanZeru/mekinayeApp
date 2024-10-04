@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:mekinaye/config/themes/data/app_theme.dart';
-import 'package:mekinaye/screen/spareparts/spare_part_screen.dart';
-import 'package:mekinaye/screen/workshop/workshop_screen.dart';
+import 'package:mekinaye/screen/garage/garage_screen.dart';
 import 'package:mekinaye/screen/rules/rules_screen.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
@@ -15,10 +14,8 @@ import '../../service/api_service.dart';
 import '../../service/authorization_service.dart';
 import '../../util/app_constants.dart';
 import '../../util/app_routes.dart';
-import '../../widget/app_bar/app_bar_widget.dart';
 import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../screen/map/map_screen.dart';
 import '../../widget/button.dart';
 import '../../widget/custom_snackbar.dart';
 import '../../widget/loading.dart';
@@ -27,8 +24,10 @@ import '../app_documentation/faq_screen.dart';
 import '../app_documentation/privacy_policies_screen.dart';
 import '../app_documentation/terms_and_conditions_screen.dart';
 import '../auth/login_screen.dart';
+import '../gas_station/gas_station_screen.dart';
 import '../profile/profile_screen.dart';
 import '../../layout/error/error_screen.dart';
+import '../workshop/workshop_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -102,14 +101,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Get.to(() => WorkshopScreen());
                                 break;
                               case "Ethio Garage":
-                                Get.to(() => SparePartScreen());
+                                Get.to(() => GarageScreen());
                                 break;
                               case "Traffic Police":
                                 pushNewScreen(context,
                                     screen: RulesScreen(isFromHome: true));
                                 break;
                               case "Gas Station":
-                                Get.to(() => MapScreen());
+                                Get.to(() => GasStationMapScreen());
                                 break;
                             }
                           },

@@ -37,7 +37,22 @@ class SparePart {
       carBrand: CarBrand.fromJson(json['carBrand']), // Parse the carBrand
     );
   }
+  factory SparePart.fromMessageJson(Map<String, dynamic> json) {
+    print(json);
+    return SparePart(
+      id: json['id'],
+      name: json['name'],
+      description: json['description'],
+      price: json['price'].toDouble(),
+      image: '${AppConstants.imageUrl}${json['image']}',
+      carBrandId: json['carBrandId'],
+      carBrand: CarBrand.fromMessageJson(json['carBrand']),
+      createdAt: DateTime.parse(json['createdAt']),
+      updatedAt: DateTime.parse(json['updatedAt']),
+    );
+  }
   factory SparePart.fromWorkshopJson(Map<String, dynamic> json) {
+    print(json);
     return SparePart(
       id: json['id'],
       name: json['name'],
