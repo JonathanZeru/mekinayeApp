@@ -31,7 +31,7 @@ target 'Runner' do
   use_modular_headers!
 
   # Add Firebase SDK pods here
-  pod 'Firebase/Core'
+  pod 'Firebase/Analytics' # Use Firebase/Analytics instead of Firebase/Core
   pod 'Firebase/Auth'
   pod 'Firebase/Firestore'
   pod 'Firebase/Messaging'
